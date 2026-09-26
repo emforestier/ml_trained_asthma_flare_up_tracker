@@ -1,69 +1,121 @@
-// Home: a tilted game-world map with the companion standing at the user's location.
-// The map stays centered on the companion (no panning), like a location game.
+// Home: a tilted game-world map. The companion stands at the user's location, and nearby
+// triggers (pollen, weather, air quality) appear as animated enemies when you zoom in.
 import 'leaflet/dist/leaflet.css';
-import { useState } from 'react';
-import { MapContainer, TileLayer } from 'react-leaflet';
-import { Link } from 'react-router-dom';
-import { getEnvironment, getLog, getRisk, useApi } from '../api';
+import { useMemo, useRef, useState } from 'react';
+import { Circle, MapContainer, TileLayer } from 'react-leaflet';
+import { Link, useNavigate } from 'react-router-dom';
+import { getEnvironment, getLog, getRisk, getTriggers, useApi } from '../api';
 import Companion from '../components/Companion';
 import ConditionChip from '../components/ConditionChip';
+import EnemyDialog from '../components/EnemyDialog';
 import FeedbackDialog from '../components/FeedbackDialog';
 import MainMenu from '../components/MainMenu';
+import MapEntities, { MAP_PERSPECTIVE_PX, MAP_TILT_DEG, MIN_ENEMY_ZOOM } from '../components/MapEntities';
+import NearbyPanel from '../components/NearbyPanel';
 import TrainerBadge from '../components/TrainerBadge';
 import { RISK_LEVELS, USE_MOCK, levelFromScore } from '../config';
+import { distanceKm } from '../geo';
 import { todayString, useGame } from '../state/GameContext';
 
-const DEFAULT_CENTER = [29.6516, -82.3248];
+const DEFAULT_CENTER = { lat: 29.6516, lon: -82.3248 };
 const DEFAULT_ZOOM = 15;
+const MIN_ZOOM = 12;
+const MAX_ZOOM = 18;
 // OpenStreetMap tiles are free for light use and require the credit shown in the corner.
 const TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const ZONE_COLORS = { pollen: '#e8b923', air_quality: '#8a78e0', weather: '#4f9bd9' };
+const TILT_STYLE = { transform: `perspective(${MAP_PERSPECTIVE_PX}px) rotateX(${MAP_TILT_DEG}deg)` };
 
 export default function MapHome() {
+  const navigate = useNavigate();
   const { profile, game } = useGame();
   const risk = useApi(getRisk);
   const environment = useApi(getEnvironment);
+  const triggers = useApi(getTriggers);
   const log = useApi(getLog);
+  const tiltRef = useRef(null);
   const [map, setMap] = useState(null);
+  const [zoom, setZoom] = useState(DEFAULT_ZOOM);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [selectedZone, setSelectedZone] = useState(null);
   // Decided once on open, so answering doesn't close the dialog before the thank-you step.
   const [feedbackOpen, setFeedbackOpen] = useState(() => game.lastFeedbackDate !== todayString());
 
   const level = risk.data ? risk.data.risk_level || levelFromScore(risk.data.risk_score) : 'low';
-  const mood = RISK_LEVELS[level].mood;
-  const center = environment.data ? [environment.data.lat, environment.data.lon] : DEFAULT_CENTER;
-  const askFeedback = log.data?.last_prediction && feedbackOpen && !menuOpen;
+  const userLat = environment.data?.lat ?? DEFAULT_CENTER.lat;
+  const userLon = environment.data?.lon ?? DEFAULT_CENTER.lon;
+  const user = useMemo(() => ({ lat: userLat, lon: userLon }), [userLat, userLon]);
+
+  // Trigger zones, nearest first.
+  const zones = useMemo(
+    () =>
+      (environment.data?.zones || [])
+        .map((zone) => ({ ...zone, distanceKm: distanceKm(user, zone) }))
+        .sort((a, b) => a.distanceKm - b.distanceKm),
+    [environment.data, user],
+  );
+
+  const askFeedback = log.data?.last_prediction && feedbackOpen && !menuOpen && !selectedZone;
+
+  function mapReady(instance) {
+    if (!instance || instance === map) return;
+    setMap(instance);
+    instance.on('zoomend', () => setZoom(instance.getZoom()));
+  }
+
+  const flyTo = (lat, lon, targetZoom) => map?.flyTo([lat, lon], targetZoom, { duration: 1.2 });
 
   return (
     <div className="map-home">
-      <div className="map-tilt" aria-hidden="true">
+      <div className="map-tilt" ref={tiltRef} style={TILT_STYLE} aria-hidden="true">
         <MapContainer
-          key={center.join(',')}
-          center={center}
+          key={`${user.lat},${user.lon}`}
+          center={[user.lat, user.lon]}
           zoom={DEFAULT_ZOOM}
-          minZoom={13}
-          maxZoom={17}
-          dragging={false}
+          minZoom={MIN_ZOOM}
+          maxZoom={MAX_ZOOM}
           zoomControl={false}
           attributionControl={false}
           scrollWheelZoom="center"
           touchZoom="center"
           doubleClickZoom="center"
           keyboard={false}
-          ref={setMap}
+          ref={mapReady}
         >
           <TileLayer url={TILE_URL} />
           <div className="map-tint" />
-          <div className="range-ring" />
+          {zones.map((zone) => (
+            <Circle
+              key={zone.id}
+              center={[zone.lat, zone.lon]}
+              radius={zone.radius_m}
+              interactive={false}
+              pathOptions={{ className: `zone-aura zone-${zone.level}`, color: ZONE_COLORS[zone.type], weight: 2, fillOpacity: 0.16 }}
+            />
+          ))}
+          <Circle
+            center={[user.lat, user.lon]}
+            radius={220}
+            interactive={false}
+            pathOptions={{ className: 'range-ring', color: '#ffffff', weight: 3, fillColor: '#ffffff', fillOpacity: 0.12 }}
+          />
         </MapContainer>
       </div>
       <div className="horizon" />
 
-      <Link to="/forecast" className="map-companion" aria-label={`${profile.companionName}. Open tomorrow's forecast`}>
-        <Companion mood={mood} size={120} />
-      </Link>
+      <MapEntities
+        map={map}
+        tiltRef={tiltRef}
+        user={user}
+        companionMood={RISK_LEVELS[level].mood}
+        companionName={profile.companionName}
+        zones={zones}
+        onCompanionTap={() => navigate('/forecast')}
+        onEnemyTap={setSelectedZone}
+      />
 
       <div className="hud-top">
-        <div style={{ display: 'grid', gap: 8, justifyItems: 'start' }}>
+        <div className="hud-top-left">
           {risk.data && (
             <Link to="/forecast" className="glass-pill risk-pill">
               <span className="risk-dot" style={{ background: RISK_LEVELS[level].color }} />
@@ -84,25 +136,32 @@ export default function MapHome() {
       </div>
 
       <div className="hud-right">
-        <button className="round-button" onClick={() => map?.setZoom(DEFAULT_ZOOM)} aria-label="Reset zoom">
+        <button className="round-button" onClick={() => flyTo(user.lat, user.lon, DEFAULT_ZOOM)} aria-label="Back to my location">
           🧭
         </button>
-        <Link to="/triggers" className="round-button" aria-label="Your triggers">
-          🔍
-        </Link>
+        <button className="round-button" onClick={() => map?.zoomIn()} disabled={zoom >= MAX_ZOOM} aria-label="Zoom in">
+          +
+        </button>
+        <button className="round-button" onClick={() => map?.zoomOut()} disabled={zoom <= MIN_ZOOM} aria-label="Zoom out">
+          −
+        </button>
       </div>
+
+      {zoom < MIN_ENEMY_ZOOM && <p className="zoom-hint">Zoom in to find triggers</p>}
 
       <div className="hud-bottom">
         <TrainerBadge />
         <button className="main-button" onClick={() => setMenuOpen(true)} aria-label="Open menu">
           <Companion mood="happy" size={50} label="Menu" />
         </button>
-        <a className="map-credit" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">
-          © OpenStreetMap
-        </a>
+        <NearbyPanel zones={zones} onSelect={(zone) => flyTo(zone.lat, zone.lon, 16)} />
       </div>
+      <a className="map-credit" href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">
+        © OpenStreetMap
+      </a>
 
       {menuOpen && <MainMenu onClose={() => setMenuOpen(false)} />}
+      {selectedZone && <EnemyDialog zone={selectedZone} triggers={triggers.data?.triggers} onClose={() => setSelectedZone(null)} />}
       {askFeedback && <FeedbackDialog lastPrediction={log.data.last_prediction} onClose={() => setFeedbackOpen(false)} />}
     </div>
   );

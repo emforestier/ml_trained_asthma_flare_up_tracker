@@ -220,8 +220,7 @@ code {
   bottom: -46%;
   left: -45%;
   right: -45%;
-  transform: perspective(900px) rotateX(42deg);
-  transform-origin: 50% 50%;
+  transform-origin: 50% 50%; /* transform is set in MapHome.jsx so the sprite math can match it */
 }
 .map-tilt .leaflet-container {
   width: 100%;
@@ -238,41 +237,8 @@ code {
   pointer-events: none;
   z-index: 450;
 }
-.range-ring {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 360px;
-  height: 360px;
-  margin: -180px 0 0 -180px;
-  border-radius: 50%;
-  border: 3px solid rgba(255, 255, 255, 0.7);
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.18), transparent 70%);
-  pointer-events: none;
-  z-index: 460;
-  animation: ring-pulse 3s ease-in-out infinite;
-}
-@keyframes ring-pulse { 0%, 100% { opacity: 0.9; } 50% { opacity: 0.55; } }
 
-/* Haze at the horizon, where the tilted map meets the sky. */
-.horizon {
-  position: absolute;
-  inset: 0 0 auto;
-  height: 34%;
-  background: linear-gradient(#cdeefb 0%, rgba(205, 238, 251, 0.85) 35%, rgba(205, 238, 251, 0));
-  pointer-events: none;
-}
 
-.map-companion {
-  position: absolute;
-  left: 50%;
-  top: 58%;
-  transform: translate(-50%, -88%);
-  background: none;
-  border: 0;
-  padding: 0;
-  cursor: pointer;
-}
 
 .hud-top {
   position: absolute;
@@ -304,59 +270,7 @@ code {
   gap: 12px;
 }
 
-.hud-bottom {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 120px;
-  padding: 0 12px calc(14px + env(safe-area-inset-bottom));
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: end;
-}
 
-/* Trainer badge: companion portrait, level, name and XP bar in the bottom-left corner. */
-.trainer {
-  position: relative;
-  display: grid;
-  grid-template-columns: 64px;
-  justify-self: start;
-  text-decoration: none;
-  color: #fff;
-}
-.trainer-portrait {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 50% 35%, #ffffff, #d7f3e4);
-  border: 3px solid #fff;
-  box-shadow: var(--shadow);
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-}
-.trainer-portrait .companion .bob { animation: none; }
-.trainer-portrait .companion .shadow { display: none; }
-.trainer-level {
-  position: absolute;
-  left: -2px;
-  top: 40px;
-  font-size: 1.35rem;
-  font-weight: 900;
-  color: #fff;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
-}
-.trainer-name {
-  font-size: 0.68rem;
-  font-weight: 900;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
-  margin-top: 2px;
-}
-.xp-bar { height: 5px; border-radius: 999px; background: rgba(255, 255, 255, 0.5); overflow: hidden; }
-.xp-bar span { display: block; height: 100%; background: #6fd3ff; border-radius: 999px; transition: width 0.8s ease; }
 
 /* The big round button in the bottom middle opens the menu. */
 .main-button {
@@ -577,12 +491,171 @@ code {
   z-index: 10;
 }
 .placeholder { display: grid; gap: 12px; }
-.map-credit {
-  justify-self: end;
-  align-self: end;
-  font-size: 0.65rem;
-  color: rgba(255, 255, 255, 0.9);
-  text-decoration: none;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-}
 .menu-screen-close { background: #fff; color: var(--teal); }
+
+/* ---------- Map world (Task 4) ---------- */
+/* Sky and clouds where the tilted map meets the horizon. */
+.horizon {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 34%;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 22% 9% at 18% 22%, rgba(255, 255, 255, 0.95), transparent 70%),
+    radial-gradient(ellipse 18% 7% at 70% 16%, rgba(255, 255, 255, 0.9), transparent 70%),
+    radial-gradient(ellipse 26% 8% at 88% 30%, rgba(255, 255, 255, 0.85), transparent 70%),
+    linear-gradient(#8fd0f2 0%, #c6ebfa 45%, rgba(214, 240, 250, 0.85) 70%, rgba(214, 240, 250, 0));
+}
+
+/* Leaflet puts these classes on the SVG circles drawn flat on the map. */
+.range-ring { animation: ring-pulse 3s ease-in-out infinite; }
+.zone-aura { animation: aura-pulse 2.6s ease-in-out infinite; }
+.zone-aura.zone-high { animation-duration: 1.6s; }
+@keyframes ring-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+@keyframes aura-pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+
+/* Upright sprites (companion and enemies) positioned over the tilted map. */
+/* Own stacking layer, so sprites stay under the HUD however large they get. */
+.map-entities { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; }
+.hud-top, .hud-right, .zoom-hint { z-index: 10; }
+.sprite {
+  position: absolute;
+  transform: translate(-50%, -94%);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  line-height: 0;
+}
+.sprite:focus-visible { outline: 3px solid #fff; outline-offset: 2px; border-radius: 12px; }
+
+.zoom-hint {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--glass);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.hud-top-left { display: grid; gap: 8px; justify-items: start; }
+.round-button:disabled { opacity: 0.5; cursor: default; }
+.hud-right .round-button { font-size: 1.5rem; font-weight: 700; }
+
+/* Bottom bar: trainer on the left, main button in the middle, nearby on the right. */
+.hud-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(86px + env(safe-area-inset-bottom));
+  padding: 0 10px env(safe-area-inset-bottom);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  background: linear-gradient(rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.85));
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 1000;
+}
+.hud-bottom .main-button { margin-top: -34px; }
+
+.trainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-self: start;
+  text-decoration: none;
+  color: var(--ink);
+  min-width: 0;
+}
+.trainer-portrait {
+  width: 60px;
+  height: 60px;
+  flex: none;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 35%, #ffffff, #d7f3e4);
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 3px var(--coral), var(--shadow);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.trainer-portrait .companion .bob { animation: none; }
+.trainer-portrait .companion .shadow, .trainer-portrait .companion .mist { display: none; }
+.trainer-text { display: grid; gap: 1px; min-width: 0; }
+.trainer-level { font-size: 1.7rem; font-weight: 300; line-height: 1; color: var(--ink); }
+.trainer-level small { font-size: 0.85rem; font-weight: 400; }
+.trainer-name { font-size: 0.95rem; color: var(--ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.xp-bar { height: 4px; width: 70px; border-radius: 999px; background: rgba(47, 59, 59, 0.15); overflow: hidden; }
+.xp-bar span { display: block; height: 100%; background: var(--teal); border-radius: 999px; transition: width 0.8s ease; }
+.main-button .companion .mist { display: none; }
+
+.nearby { justify-self: end; display: grid; justify-items: end; gap: 2px; }
+.nearby-title { font-size: 0.66rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); }
+.nearby-list { display: flex; gap: 2px; }
+.nearby-item {
+  display: grid;
+  justify-items: center;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  line-height: 1;
+}
+.nearby-item .enemy-float, .nearby-item .enemy-ring { animation: none; }
+
+.map-credit {
+  position: absolute;
+  right: 8px;
+  bottom: calc(90px + env(safe-area-inset-bottom));
+  font-size: 0.62rem;
+  color: rgba(47, 59, 59, 0.75);
+  text-decoration: none;
+  z-index: 1000;
+}
+
+.dialog-enemy { display: grid; place-items: center; margin-top: -8px; }
+
+/* ---------- Enemy animations (Task 4) ---------- */
+.enemy { display: block; overflow: visible; }
+.enemy-float { animation: enemy-bob 2s ease-in-out infinite; }
+.enemy-high .enemy-float { animation-duration: 1.3s; }
+.enemy-ring { animation: ring-glow 1.8s ease-in-out infinite; }
+.enemy-blink { animation: blink 3.8s infinite; transform-origin: center; transform-box: fill-box; }
+
+.pollen-spikes { animation: spin 9s linear infinite; transform-origin: 60px 60px; }
+.enemy-high .pollen-spikes { animation-duration: 5s; }
+.dust { animation: dust-drift 2.4s ease-out infinite; }
+.dust-2 { animation-delay: 0.6s; }
+.dust-3 { animation-delay: 1.2s; }
+.dust-4 { animation-delay: 1.8s; }
+
+.drop { animation: rain-fall 0.9s linear infinite; }
+.drop-2 { animation-delay: 0.3s; }
+.drop-3 { animation-delay: 0.6s; }
+.bolt { animation: bolt-flash 2.2s steps(1) infinite; }
+
+.enemy-air_quality .enemy-float { animation: smog-sway 2.6s ease-in-out infinite; transform-origin: 60px 100px; }
+.smoke { animation: smoke-rise 2.8s ease-out infinite; }
+.smoke-2 { animation-delay: 1.4s; }
+.swirl { animation: swirl-fade 2s ease-in-out infinite; }
+
+@keyframes enemy-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes ring-glow { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes dust-drift { 0% { opacity: 0; transform: translate(0, 0); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(6px, -16px); } }
+@keyframes rain-fall { 0% { opacity: 0; transform: translateY(-4px); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(14px); } }
+@keyframes bolt-flash { 0%, 70%, 80%, 100% { opacity: 0; } 72%, 78% { opacity: 1; } }
+@keyframes smog-sway { 0%, 100% { transform: rotate(-4deg) translateY(0); } 50% { transform: rotate(4deg) translateY(-5px); } }
+@keyframes smoke-rise { 0% { opacity: 0; transform: translate(0, 6px) scale(0.6); } 30% { opacity: 0.9; } 100% { opacity: 0; transform: translate(0, -18px) scale(1.5); } }
+@keyframes swirl-fade { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }

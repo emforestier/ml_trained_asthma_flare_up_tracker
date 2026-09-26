@@ -2,3 +2,5 @@
 .env
 __pycache__/
 *.pyc
+# Cached API responses written by backend/caching.py
+backend/data/

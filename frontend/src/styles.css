@@ -212,33 +212,9 @@ code {
 /* ---------- Map home (Task 3) ---------- */
 .map-home { position: absolute; inset: 0; }
 
-/* The map is tilted in 3D like a game world. It is oversized so the tilt still fills the
-   screen, and centered on the point where the companion stands (58% down the screen). */
-.map-tilt {
-  position: absolute;
-  top: -30%;
-  bottom: -46%;
-  left: -45%;
-  right: -45%;
-  transform-origin: 50% 50%; /* transform is set in MapHome.jsx so the sprite math can match it */
-}
-.map-tilt .leaflet-container {
-  width: 100%;
-  height: 100%;
-  background: var(--map-green);
-}
-/* Tint the plain map tiles into game-world greens. */
-.map-tilt .leaflet-tile-pane { filter: saturate(0) brightness(1.08) contrast(1.1); opacity: 0.55; }
-.map-tint {
-  position: absolute;
-  inset: 0;
-  background: #7fd88c;
-  mix-blend-mode: multiply;
-  pointer-events: none;
-  z-index: 450;
-}
-
-
+/* MapLibre draws the tilted map; it fills the screen behind the HUD. */
+.game-map { position: absolute; inset: 0; background: #8fe69a; }
+.game-map .maplibregl-canvas:focus { outline: none; }
 
 .hud-top {
   position: absolute;
@@ -507,13 +483,6 @@ code {
     linear-gradient(#8fd0f2 0%, #c6ebfa 45%, rgba(214, 240, 250, 0.85) 70%, rgba(214, 240, 250, 0));
 }
 
-/* Leaflet puts these classes on the SVG circles drawn flat on the map. */
-.range-ring { animation: ring-pulse 3s ease-in-out infinite; }
-.zone-aura { animation: aura-pulse 2.6s ease-in-out infinite; }
-.zone-aura.zone-high { animation-duration: 1.6s; }
-@keyframes ring-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
-@keyframes aura-pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
-
 /* Upright sprites (companion and enemies) positioned over the tilted map. */
 /* Own stacking layer, so sprites stay under the HUD however large they get. */
 .map-entities { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; }
@@ -618,11 +587,10 @@ code {
   position: absolute;
   right: 8px;
   bottom: calc(90px + env(safe-area-inset-bottom));
-  font-size: 0.62rem;
-  color: rgba(47, 59, 59, 0.75);
-  text-decoration: none;
+  font-size: 0.6rem;
   z-index: 1000;
 }
+.map-credit a { color: rgba(47, 59, 59, 0.8); text-decoration: none; }
 
 .dialog-enemy { display: grid; place-items: center; margin-top: -8px; }
 

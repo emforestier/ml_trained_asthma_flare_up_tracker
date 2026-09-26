@@ -1,6 +1,7 @@
 {
-  "user": "demo",
+  "user_id": "demo-user-1",
   "updated": "2026-09-27",
+  "data_mode": "demo",
   "triggers": [
     {
       "feature": "pollen",
@@ -8,7 +9,7 @@
       "strength": "strong",
       "score": 0.42,
       "discovered": true,
-      "evidence": "High pollen came before 4 of your 5 flare-ups this month."
+      "evidence": "Synthetic pollen was high the day before 4 of your 5 recorded flare-up days this month."
     },
     {
       "feature": "pressure_drop",
@@ -16,7 +17,7 @@
       "strength": "moderate",
       "score": 0.23,
       "discovered": true,
-      "evidence": "Your symptoms rise the day after a pressure drop of 6 hPa or more."
+      "evidence": "Drops of 6 hPa or more in a day were followed by higher demo scores."
     },
     {
       "feature": "air_quality",
@@ -24,7 +25,7 @@
       "strength": "weak",
       "score": 0.09,
       "discovered": true,
-      "evidence": "Poor air quality days slightly raise your risk."
+      "evidence": "Poorer air quality days nudged demo scores up slightly."
     },
     {
       "feature": "humidity",
@@ -32,7 +33,7 @@
       "strength": "none",
       "score": 0.0,
       "discovered": false,
-      "evidence": "Not enough humid days yet to tell."
+      "evidence": "Not enough humid days recorded yet to tell."
     },
     {
       "feature": "cold_air",
@@ -40,7 +41,7 @@
       "strength": "none",
       "score": 0.0,
       "discovered": false,
-      "evidence": "We'll learn this once the weather turns cold."
+      "evidence": "No cold days recorded yet."
     }
   ]
 }

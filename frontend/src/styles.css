@@ -487,9 +487,15 @@ code {
 /* Own stacking layer, so sprites stay under the HUD however large they get. */
 .map-entities { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; }
 .hud-top, .hud-right, .zoom-hint { z-index: 10; }
+/* Sprites are drawn once at a fixed size and moved with transforms set in MapEntities.jsx.
+   The origin is at their feet so scaling keeps them standing in the same spot. */
 .sprite {
   position: absolute;
-  transform: translate(-50%, -94%);
+  left: 0;
+  top: 0;
+  visibility: hidden;
+  transform-origin: 50% 94%;
+  will-change: transform, opacity;
   background: none;
   border: 0;
   padding: 0;

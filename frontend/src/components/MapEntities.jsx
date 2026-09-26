@@ -1,7 +1,8 @@
 // Draws the companion and the trigger enemies standing upright on the tilted map.
-// MapLibre tells us where each spot is on screen; comparing how long a short distance looks
-// there versus at the screen center gives the perspective scale, so far sprites look smaller.
-import { useEffect, useState } from 'react';
+// For smooth panning and zooming, sprites are rendered once at a fixed size, then moved and
+// scaled directly with a GPU-friendly CSS transform in the same frame MapLibre draws the map.
+// React only re-renders when the set of sprites changes, never on every map frame.
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Companion from './Companion';
 import Enemy from './Enemy';
 
@@ -9,8 +10,12 @@ export const MIN_ENEMY_ZOOM = 14.5;
 const BASE_ZOOM = 16;
 const ENEMY_SIZE = { low: 58, moderate: 70, high: 84 };
 const COMPANION_SIZE = 110;
+const RENDER_SIZE = 150; // sprites are drawn at this size and scaled with CSS
+const MIN_SIZE = 20;
+const MAX_SIZE = 230;
 const HORIZON = 0.2; // fraction of screen height where the map fades into the sky
 const PROBE_METERS = 30;
+const FEET = 0.94; // where a sprite's feet are, as a fraction of its height
 
 // Screen length of a short east-west step at a point, used to measure perspective.
 function stepLength(map, lon, lat) {
@@ -21,76 +26,109 @@ function stepLength(map, lon, lat) {
 }
 
 export default function MapEntities({ map, user, companionMood, companionName, zones, onCompanionTap, onEnemyTap }) {
-  const [, setFrame] = useState(0);
+  const elements = useRef(new Map());
+  const [enemiesShown, setEnemiesShown] = useState(true);
 
-  // Re-render whenever the map moves or zooms.
-  useEffect(() => {
-    if (!map) return undefined;
-    let request = 0;
-    const update = () => {
-      cancelAnimationFrame(request);
-      request = requestAnimationFrame(() => setFrame((frame) => frame + 1));
-    };
-    map.on('move', update);
-    map.on('resize', update);
-    map.on('load', update);
-    update();
-    return () => {
-      cancelAnimationFrame(request);
-      map.off('move', update);
-      map.off('resize', update);
-      map.off('load', update);
-    };
+  // Everything that stands on the map, with where it stands and how big it is.
+  const items = useMemo(
+    () => [
+      ...zones.map((zone) => ({ key: zone.id, kind: 'enemy', zone, lat: zone.lat, lon: zone.lon, size: ENEMY_SIZE[zone.level] || ENEMY_SIZE.moderate, growth: 1 })),
+      { key: 'companion', kind: 'companion', lat: user.lat, lon: user.lon, size: COMPANION_SIZE, growth: 0.5 },
+    ],
+    [zones, user],
+  );
+  const itemsRef = useRef(items);
+  itemsRef.current = items;
+
+  // Positions every sprite for the map's current view. Runs inside the map's own render frame.
+  const place = useCallback(() => {
+    if (!map) return;
+    const container = map.getContainer();
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    if (!width || !height) return;
+
+    const zoom = map.getZoom();
+    const showEnemies = zoom >= MIN_ENEMY_ZOOM;
+    setEnemiesShown((previous) => (previous === showEnemies ? previous : showEnemies));
+    const zoomScale = 2 ** ((zoom - BASE_ZOOM) * 0.6);
+    const center = map.getCenter();
+    const centerStep = stepLength(map, center.lng, center.lat) || 1;
+
+    for (const item of itemsRef.current) {
+      const element = elements.current.get(item.key);
+      if (!element) continue;
+      if (item.kind === 'enemy' && !showEnemies) {
+        element.style.visibility = 'hidden';
+        continue;
+      }
+      const { x, y } = map.project([item.lon, item.lat]);
+      const perspective = Math.min(2.2, Math.max(0.25, stepLength(map, item.lon, item.lat) / centerStep));
+      const size = Math.min(MAX_SIZE, Math.max(MIN_SIZE, item.size * perspective * zoomScale ** item.growth));
+      const offScreen = y < height * HORIZON || y > height + size || x < -size || x > width + size;
+      if (offScreen) {
+        element.style.visibility = 'hidden';
+        continue;
+      }
+      // The transform origin is the sprite's feet, so scaling keeps them planted on the ground.
+      const tx = x - RENDER_SIZE / 2;
+      const ty = y - RENDER_SIZE * FEET;
+      element.style.visibility = 'visible';
+      element.style.opacity = String(Math.min(1, (y - height * HORIZON) / (height * 0.1)));
+      element.style.transform = `translate3d(${tx}px, ${ty}px, 0) scale(${size / RENDER_SIZE})`;
+      element.style.zIndex = String(Math.round(y));
+    }
   }, [map]);
 
-  if (!map) return null;
-  const container = map.getContainer();
-  const width = container.clientWidth;
-  const height = container.clientHeight;
-  if (!width || !height) return null;
+  // Follow the map frame by frame.
+  useEffect(() => {
+    if (!map) return undefined;
+    map.on('render', place);
+    map.on('resize', place);
+    place();
+    return () => {
+      map.off('render', place);
+      map.off('resize', place);
+    };
+  }, [map, place]);
 
-  const zoom = map.getZoom();
-  const zoomScale = 2 ** ((zoom - BASE_ZOOM) * 0.6);
-  const center = map.getCenter();
-  const centerStep = stepLength(map, center.lng, center.lat) || 1;
+  // Place newly mounted sprites before the browser paints them.
+  useLayoutEffect(() => {
+    place();
+  }, [items, enemiesShown, place]);
 
-  // growth: how strongly the sprite scales with zoom (enemies 1, the companion less).
-  function place(lat, lon, baseSize, growth = 1) {
-    const { x, y } = map.project([lon, lat]);
-    const perspective = Math.min(2.2, Math.max(0.25, stepLength(map, lon, lat) / centerStep));
-    const size = Math.min(230, Math.max(20, baseSize * perspective * zoomScale ** growth));
-    if (y < height * HORIZON || y > height + size || x < -size || x > width + size) return null;
-    // Fade sprites out as they approach the horizon.
-    const opacity = Math.min(1, (y - height * HORIZON) / (height * 0.1));
-    return { x, y, size, opacity };
-  }
-
-  const sprites = [];
-  if (zoom >= MIN_ENEMY_ZOOM) {
-    for (const zone of zones) {
-      const spot = place(zone.lat, zone.lon, ENEMY_SIZE[zone.level] || ENEMY_SIZE.moderate);
-      if (spot) sprites.push({ kind: 'enemy', zone, ...spot });
-    }
-  }
-  const me = place(user.lat, user.lon, COMPANION_SIZE, 0.5);
-  if (me) sprites.push({ kind: 'companion', ...me });
-  sprites.sort((a, b) => a.y - b.y);
+  const register = (key) => (element) => {
+    if (element) elements.current.set(key, element);
+    else elements.current.delete(key);
+  };
 
   return (
     <div className="map-entities">
-      {sprites.map((sprite) => {
-        const style = { left: sprite.x, top: sprite.y, zIndex: Math.round(sprite.y), opacity: sprite.opacity };
-        if (sprite.kind === 'companion') {
+      {items.map((item) => {
+        if (item.kind === 'companion') {
           return (
-            <button key="companion" className="sprite companion-sprite" style={style} onClick={onCompanionTap} aria-label={`${companionName}. Open tomorrow's forecast`}>
-              <Companion mood={companionMood} size={sprite.size} />
+            <button
+              key={item.key}
+              ref={register(item.key)}
+              className="sprite companion-sprite"
+              onClick={onCompanionTap}
+              aria-label={`${companionName}. Open tomorrow's forecast`}
+            >
+              <Companion mood={companionMood} size={RENDER_SIZE} />
             </button>
           );
         }
-        const { zone } = sprite;
+        if (!enemiesShown) return null;
+        const { zone } = item;
         return (
-          <button key={zone.id} className="sprite" style={style} onClick={() => onEnemyTap(zone)} aria-label={`${zone.label}, ${zone.level}. Show details`}>
-            <Enemy type={zone.type} level={zone.level} size={sprite.size} />
+          <button
+            key={item.key}
+            ref={register(item.key)}
+            className="sprite"
+            onClick={() => onEnemyTap(zone)}
+            aria-label={`${zone.label}, ${zone.level}. Show details`}
+          >
+            <Enemy type={zone.type} level={zone.level} size={RENDER_SIZE} />
           </button>
         );
       })}

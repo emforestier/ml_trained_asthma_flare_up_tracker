@@ -47,7 +47,7 @@ export default function FeedbackDialog({ lastPrediction, onClose }) {
     return (
       <GameDialog
         title={`Thanks! +${XP_PER_FEEDBACK} XP`}
-        message={`${correct} matching ${correct === 1 ? 'outcome' : 'outcomes'} out of ${total} answered ${total === 1 ? 'day' : 'days'} so far. Your answers help check the demo model.`}
+        message={`${correct} matching ${correct === 1 ? 'outcome' : 'outcomes'} out of ${total} answered ${total === 1 ? 'day' : 'days'} so far. Your answers help us make better predictions.`}
         confirmLabel="OK"
         onConfirm={onClose}
         onCancel={onClose}

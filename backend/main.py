@@ -1,3 +1,5 @@
+import requests
+from backend.environment import fetch_environment
 import json
 from pathlib import Path
 from datetime import date as Date
@@ -22,7 +24,22 @@ def health():
 
 @app.get("/environment")
 def get_environment(user: str = "demo-user-1"):
-    return load_sample("environment")
+    try:
+        return fetch_environment()
+
+    except (
+        requests.RequestException,
+        ValueError,
+        KeyError,
+        TypeError,
+    ):
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "Environmental data is temporarily unavailable. "
+                "Please try again shortly."
+            ),
+        )
 
 
 @app.get("/risk")

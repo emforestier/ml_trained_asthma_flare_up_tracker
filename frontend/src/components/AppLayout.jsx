@@ -1,16 +1,14 @@
-// Mobile frame shared by every tab: scrolling content above a fixed bottom navigation.
-import { Outlet } from 'react-router-dom';
-import { USE_MOCK } from '../config';
-import BottomNav from './BottomNav';
+// Layout for the screens opened from the menu: a teal gradient page with a round
+// close button at the bottom that returns to the map.
+import { Link, Outlet } from 'react-router-dom';
 
 export default function AppLayout() {
   return (
-    <div className="app">
-      {USE_MOCK && <div className="mock-flag">Mock data</div>}
-      <main className="screen">
-        <Outlet />
-      </main>
-      <BottomNav />
+    <div className="menu-screen">
+      <Outlet />
+      <Link to="/" className="close-button menu-screen-close" aria-label="Back to map">
+        ×
+      </Link>
     </div>
   );
 }

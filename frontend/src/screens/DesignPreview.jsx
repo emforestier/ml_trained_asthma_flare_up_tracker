@@ -31,7 +31,7 @@ export default function DesignPreview() {
 
       <section className="card">
         <h2>Meet Breezy</h2>
-        <p className="muted">A little cloud with a sprout. Its mood follows tomorrow's flare-up risk.</p>
+        <p className="muted">A friendly little inhaler. Its mood follows tomorrow's flare-up risk, and it puffs mist when it's calm.</p>
         <div className="mood-row">
           {MOODS.map(([mood, label, color]) => (
             <div key={mood}>

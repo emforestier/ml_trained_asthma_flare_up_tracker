@@ -31,3 +31,16 @@ export const DEFAULT_COMPANION_NAME = 'Breezy';
 export const DEFAULT_CITY = 'Gainesville, FL';
 
 export const DISCLAIMER = "This app helps you track risk and doesn't replace advice from your doctor.";
+
+// A prediction counts as "flare-up expected" at or above this score when scoring feedback.
+export const FLARE_PREDICTION_THRESHOLD = 0.5;
+
+// When a condition counts as bad enough to flag on the condition chip.
+export const CONDITION_ALERTS = {
+  pollenHigh: 3.5, // 0-5 index
+  pollenModerate: 2.5,
+  aqiHigh: 100,
+  aqiModerate: 51,
+  pressureDropHigh: -6, // hPa in 24h
+  pressureDropModerate: -3,
+};

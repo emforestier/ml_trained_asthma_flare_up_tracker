@@ -1,15 +1,23 @@
 /* ---------- Design tokens ----------
-   Art style: soft, rounded and friendly, like a pocket pet game. Warm cream background,
-   white cards with big radii, one chunky rounded font (Nunito).
+   Art style: a location game. A full-screen green map with floating round buttons,
+   soft teal-green gradients, white dialogs, light Lato type.
    Risk colors are reserved for risk: mint = low, sun = moderate, coral = high. */
 :root {
-  --bg: #f7f4ee;
+  --bg: #f4f7f5;
   --card: #ffffff;
-  --ink: #1f2a37;
-  --ink-soft: #5b6573;
-  --line: #e7e2d8;
+  --ink: #2f3b3b;
+  --ink-soft: #6b7a7a;
+  --line: #e2e9e6;
 
-  --sky: #3e7cb1;       /* primary actions, links */
+  --teal: #4aa89a;       /* primary text buttons, links */
+  --teal-deep: #2f6f73;
+  --grad-button: linear-gradient(90deg, #a6e3a1, #5cc1a0);
+  --grad-screen: linear-gradient(160deg, #6fc79a 0%, #3f8f8a 55%, #2f5f73 100%);
+  --grad-sky: linear-gradient(#bfe6f7 0%, #e3f5fb 38%, #9fdc8f 39%, #6cbf6a 100%);
+  --map-green: #9fe0a4;
+  --glass: rgba(34, 78, 74, 0.55);
+
+  --sky: #3e7cb1;
   --sky-soft: #e3eef8;
   --mint: #3fae8c;      /* low risk, success */
   --mint-soft: #dcf2ea;
@@ -17,26 +25,25 @@
   --sun-soft: #fdf0d5;
   --coral: #e2574c;     /* high risk */
   --coral-soft: #fbe3e0;
-  --lav: #8a78e0;       /* game accents: levels, badges */
+  --lav: #8a78e0;       /* levels and badges */
   --lav-soft: #ece8fc;
 
   --pollen: #e8b923;
   --air: #7d8ea3;
   --weather: #4f9bd9;
 
-  --radius: 22px;
-  --radius-sm: 14px;
-  --shadow: 0 6px 20px rgba(31, 42, 55, 0.08);
-  --font: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --nav-height: 76px;
+  --radius: 18px;
+  --radius-sm: 12px;
+  --shadow: 0 4px 14px rgba(20, 50, 45, 0.18);
+  --font: 'Lato', system-ui, -apple-system, 'Segoe UI', sans-serif;
 }
 
 * { box-sizing: border-box; }
 
-html, body, #root { margin: 0; min-height: 100%; }
+html, body, #root { margin: 0; height: 100%; }
 
 body {
-  background: var(--bg);
+  background: #2f5f73;
   color: var(--ink);
   font-family: var(--font);
   font-size: 16px;
@@ -44,69 +51,12 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3 { margin: 0; line-height: 1.2; font-weight: 900; }
-h1 { font-size: 1.6rem; }
-h2 { font-size: 1.2rem; }
-h3 { font-size: 1rem; font-weight: 800; }
+h1, h2, h3 { margin: 0; line-height: 1.2; font-weight: 700; }
+h1 { font-size: 1.5rem; }
+h2 { font-size: 1.15rem; }
+h3 { font-size: 1rem; }
 p { margin: 0; }
 button { font-family: inherit; }
-
-/* ---------- Companion ---------- */
-.companion { display: block; overflow: visible; }
-.companion .body { transition: fill 0.4s ease; }
-
-.companion.mood-happy .bob { animation: bounce 2.4s ease-in-out infinite; }
-.companion.mood-uneasy .bob { animation: sway 3s ease-in-out infinite; transform-origin: 100px 150px; }
-.companion.mood-worried .bob { animation: shiver 0.5s linear infinite; }
-.companion .shadow { animation: shadow-pulse 2.4s ease-in-out infinite; transform-origin: 100px 188px; }
-.companion .blink { animation: blink 4.5s infinite; transform-origin: center; transform-box: fill-box; }
-.companion .sweat { animation: drip 1.6s ease-in infinite; }
-.companion .sprout { animation: wiggle 3.2s ease-in-out infinite; transform-origin: 100px 42px; }
-
-@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
-@keyframes sway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
-@keyframes shiver { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-1.5px); } 75% { transform: translateX(1.5px); } }
-@keyframes shadow-pulse { 0%, 100% { transform: scaleX(1); opacity: 0.18; } 50% { transform: scaleX(0.86); opacity: 0.12; } }
-@keyframes blink { 0%, 94%, 100% { transform: scaleY(1); } 97% { transform: scaleY(0.1); } }
-@keyframes drip { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(14px); opacity: 0; } }
-@keyframes wiggle { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation: none !important; transition: none !important; }
-}
-
-/* ---------- Design preview (Task 1) ---------- */
-.design { max-width: 440px; margin: 0 auto; padding: 24px 16px 48px; display: grid; gap: 20px; }
-.design .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px; }
-.design .muted { color: var(--ink-soft); font-size: 0.92rem; }
-.mood-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; margin-top: 12px; }
-.mood-row .tag { font-weight: 800; font-size: 0.85rem; margin-top: 4px; }
-.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; margin-top: 12px; }
-.swatch { border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--line); font-size: 0.78rem; }
-.swatch .chip { height: 44px; }
-.swatch .name { padding: 6px 8px; font-weight: 700; }
-
-/* ---------- App shell (Task 2) ---------- */
-.app {
-  max-width: 440px;
-  margin: 0 auto;
-  min-height: 100vh;
-  min-height: 100dvh;
-  position: relative;
-}
-
-.screen {
-  padding: 20px 16px calc(var(--nav-height) + 28px + env(safe-area-inset-bottom));
-  display: grid;
-  gap: 16px;
-}
-
-.card {
-  background: var(--card);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 18px;
-}
 
 .muted { color: var(--ink-soft); font-size: 0.92rem; }
 
@@ -118,70 +68,521 @@ code {
   font-size: 0.9em;
 }
 
+/* ---------- Companion ---------- */
+.companion { display: block; overflow: visible; }
+.companion .body { transition: fill 0.4s ease; }
+
+.companion.mood-happy .bob { animation: bounce 2.4s ease-in-out infinite; }
+.companion.mood-uneasy .bob { animation: sway 3s ease-in-out infinite; transform-origin: 100px 150px; }
+.companion.mood-worried .bob { animation: shiver 0.5s linear infinite; }
+.companion .shadow { animation: shadow-pulse 2.4s ease-in-out infinite; transform-origin: 100px 188px; }
+.companion .blink { animation: blink 4.5s infinite; transform-origin: center; transform-box: fill-box; }
+.companion .sweat { animation: drip 1.6s ease-in infinite; }
+/* Inhaler: the canister presses down and the mouthpiece puffs mist at the same moment.
+   Happy puffs often, uneasy less often, worried not at all. */
+.companion.mood-happy { --puff-cycle: 2.4s; }
+.companion.mood-uneasy { --puff-cycle: 4.8s; }
+.companion.mood-happy .canister, .companion.mood-uneasy .canister { animation: press var(--puff-cycle) ease-in-out infinite; }
+.companion .puff { opacity: 0; transform-box: fill-box; transform-origin: center; }
+.companion .puff-2 { --puff-delay: 0.12s; }
+.companion .puff-3 { --puff-delay: 0.24s; }
+.companion.mood-happy .puff, .companion.mood-uneasy .puff { animation: puff var(--puff-cycle) ease-out var(--puff-delay, 0s) infinite; }
+
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+@keyframes sway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+@keyframes shiver { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-1.5px); } 75% { transform: translateX(1.5px); } }
+@keyframes shadow-pulse { 0%, 100% { transform: scaleX(1); opacity: 0.18; } 50% { transform: scaleX(0.86); opacity: 0.12; } }
+@keyframes blink { 0%, 94%, 100% { transform: scaleY(1); } 97% { transform: scaleY(0.1); } }
+@keyframes drip { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(14px); opacity: 0; } }
+@keyframes press { 0%, 38%, 60%, 100% { transform: translateY(0); } 46% { transform: translateY(8px); } }
+@keyframes puff {
+  0%, 44% { opacity: 0; transform: translate(0, 0) scale(0.4); }
+  52% { opacity: 0.95; transform: translate(4px, -2px) scale(0.8); }
+  100% { opacity: 0; transform: translate(26px, -18px) scale(1.7); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ---------- Design preview (Task 1) ---------- */
+.design { max-width: 440px; margin: 0 auto; padding: 24px 16px 48px; display: grid; gap: 20px; background: var(--bg); min-height: 100%; }
+.design .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px; }
+.mood-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; margin-top: 12px; }
+.mood-row .tag { font-weight: 800; font-size: 0.85rem; margin-top: 4px; }
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; margin-top: 12px; }
+.swatch { border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--line); font-size: 0.78rem; }
+.swatch .chip { height: 44px; }
+.swatch .name { padding: 6px 8px; font-weight: 700; }
+
+/* ---------- Phone frame ----------
+   Every screen fills a phone-width column; wider screens show it centered. */
+.phone {
+  position: relative;
+  max-width: 440px;
+  height: 100%;
+  margin: 0 auto;
+  overflow: hidden;
+  background: var(--map-green);
+}
+
+/* ---------- Game controls ---------- */
+.pill-button {
+  min-height: 46px;
+  padding: 0 28px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--grad-button);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  box-shadow: 0 3px 8px rgba(60, 140, 110, 0.35);
+  cursor: pointer;
+  transition: transform 0.12s ease, filter 0.2s ease;
+}
+.pill-button:hover { filter: brightness(1.05); }
+.pill-button:active { transform: scale(0.96); }
+.pill-button:disabled { opacity: 0.6; }
+
+.text-button {
+  min-height: 44px;
+  padding: 0 20px;
+  border: 0;
+  background: none;
+  color: var(--teal);
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.round-button {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--shadow);
+  display: grid;
+  place-items: center;
+  font-size: 1.3rem;
+  color: var(--teal-deep);
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.12s ease;
+}
+.round-button:active { transform: scale(0.92); }
+
+.pill-button:focus-visible, .text-button:focus-visible, .round-button:focus-visible, .main-button:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+/* Translucent label, like a creature's name tag in an encounter. */
+.glass-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: var(--glass);
+  color: #fff;
+  font-size: 1.1rem;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  text-decoration: none;
+  border: 0;
+  font-family: inherit;
+}
+.glass-pill .divider { opacity: 0.6; font-weight: 300; }
+.glass-pill small { font-size: 0.78rem; opacity: 0.85; letter-spacing: 0.04em; }
+
 .mock-flag {
-  position: fixed;
-  top: 10px;
-  right: max(10px, calc(50% - 210px));
-  z-index: 1000;
   background: var(--lav);
   color: #fff;
-  font-size: 0.72rem;
-  font-weight: 800;
+  font-size: 0.7rem;
+  font-weight: 700;
   padding: 3px 10px;
   border-radius: 999px;
-  letter-spacing: 0.02em;
 }
 
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
+/* ---------- Map home (Task 3) ---------- */
+.map-home { position: absolute; inset: 0; }
+
+/* The map is tilted in 3D like a game world. It is oversized so the tilt still fills the
+   screen, and centered on the point where the companion stands (58% down the screen). */
+.map-tilt {
+  position: absolute;
+  top: -30%;
+  bottom: -46%;
+  left: -45%;
+  right: -45%;
+  transform: perspective(900px) rotateX(42deg);
+  transform-origin: 50% 50%;
+}
+.map-tilt .leaflet-container {
   width: 100%;
-  max-width: 440px;
-  height: calc(var(--nav-height) + env(safe-area-inset-bottom));
-  padding: 8px 8px env(safe-area-inset-bottom);
-  background: var(--card);
-  border-top: 1px solid var(--line);
-  border-radius: 22px 22px 0 0;
-  box-shadow: 0 -6px 20px rgba(31, 42, 55, 0.06);
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  align-items: center;
-  z-index: 900;
+  height: 100%;
+  background: var(--map-green);
+}
+/* Tint the plain map tiles into game-world greens. */
+.map-tilt .leaflet-tile-pane { filter: saturate(0) brightness(1.08) contrast(1.1); opacity: 0.55; }
+.map-tint {
+  position: absolute;
+  inset: 0;
+  background: #7fd88c;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  z-index: 450;
+}
+.range-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 360px;
+  height: 360px;
+  margin: -180px 0 0 -180px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.7);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.18), transparent 70%);
+  pointer-events: none;
+  z-index: 460;
+  animation: ring-pulse 3s ease-in-out infinite;
+}
+@keyframes ring-pulse { 0%, 100% { opacity: 0.9; } 50% { opacity: 0.55; } }
+
+/* Haze at the horizon, where the tilted map meets the sky. */
+.horizon {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 34%;
+  background: linear-gradient(#cdeefb 0%, rgba(205, 238, 251, 0.85) 35%, rgba(205, 238, 251, 0));
+  pointer-events: none;
 }
 
-.tab {
+.map-companion {
+  position: absolute;
+  left: 50%;
+  top: 58%;
+  transform: translate(-50%, -88%);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.hud-top {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  min-height: 48px;
-  color: var(--ink-soft);
-  text-decoration: none;
-  font-size: 0.72rem;
-  font-weight: 700;
-  border-radius: var(--radius-sm);
-  -webkit-tap-highlight-color: transparent;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+.hud-top-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.streak-chip {
+  background: rgba(255, 255, 255, 0.92);
+  color: #9a5b00;
+  font-weight: 900;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  box-shadow: var(--shadow);
+}
+.risk-pill .risk-dot { width: 12px; height: 12px; border-radius: 50%; box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35); }
+
+.hud-right {
+  position: absolute;
+  right: 12px;
+  top: 30%;
+  display: grid;
+  gap: 12px;
 }
 
-.tab.active { color: var(--sky); }
-.tab:focus-visible { outline: 3px solid var(--sky-soft); }
-.tab-icon { display: grid; place-items: center; transition: transform 0.2s ease; }
-.tab.active .tab-icon { transform: translateY(-2px); }
+.hud-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 120px;
+  padding: 0 12px calc(14px + env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: end;
+}
 
-/* The daily quest tab sits raised in the middle. */
-.tab.primary .tab-icon {
+/* Trainer badge: companion portrait, level, name and XP bar in the bottom-left corner. */
+.trainer {
+  position: relative;
+  display: grid;
+  grid-template-columns: 64px;
+  justify-self: start;
+  text-decoration: none;
+  color: #fff;
+}
+.trainer-portrait {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 35%, #ffffff, #d7f3e4);
+  border: 3px solid #fff;
+  box-shadow: var(--shadow);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.trainer-portrait .companion .bob { animation: none; }
+.trainer-portrait .companion .shadow { display: none; }
+.trainer-level {
+  position: absolute;
+  left: -2px;
+  top: 40px;
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+.trainer-name {
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  margin-top: 2px;
+}
+.xp-bar { height: 5px; border-radius: 999px; background: rgba(255, 255, 255, 0.5); overflow: hidden; }
+.xp-bar span { display: block; height: 100%; background: #6fd3ff; border-radius: 999px; transition: width 0.8s ease; }
+
+/* The big round button in the bottom middle opens the menu. */
+.main-button {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  border: 4px solid #fff;
+  background: radial-gradient(circle at 50% 30%, #ffe08a, var(--sun) 70%);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.main-button:active { transform: scale(0.92); }
+.main-button .companion .bob { animation: none; }
+.main-button .companion .shadow { display: none; }
+
+/* ---------- Menu drawer ---------- */
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 45, 45, 0.45);
+  z-index: 1500;
+  animation: fade-in 0.2s ease;
+}
+.menu-drawer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1600;
+  padding: 26px 18px calc(22px + env(safe-area-inset-bottom));
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 28px 28px 0 0;
+  display: grid;
+  gap: 18px;
+  justify-items: center;
+  animation: slide-up 0.25s ease;
+}
+.menu-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; }
+.menu-item {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.menu-item .round-button { width: 62px; height: 62px; font-size: 1.6rem; background: var(--bg); box-shadow: none; }
+.close-button {
   width: 56px;
   height: 56px;
-  margin-top: -30px;
   border-radius: 50%;
-  background: var(--sun);
+  border: 0;
+  background: var(--teal);
   color: #fff;
-  box-shadow: 0 6px 16px rgba(240, 169, 46, 0.45);
-  border: 4px solid var(--bg);
+  font-size: 1.6rem;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  text-decoration: none;
 }
-.tab.primary.active .tab-icon { background: var(--sky); box-shadow: 0 6px 16px rgba(62, 124, 177, 0.4); }
-.tab.primary.active { color: var(--sky); }
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes slide-up { from { transform: translateY(100%); } }
 
+/* ---------- Dialog ---------- */
+.dialog-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(20, 45, 45, 0.35);
+  animation: fade-in 0.2s ease;
+}
+.dialog {
+  width: 100%;
+  max-width: 320px;
+  background: #fff;
+  border-radius: 6px;
+  padding: 28px 22px 14px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  display: grid;
+  gap: 14px;
+  animation: pop-in 0.25s ease;
+}
+.dialog h2 { font-size: 1.05rem; font-weight: 700; color: var(--ink); }
+.dialog p { font-size: 0.92rem; color: var(--ink-soft); }
+.dialog .pill-button { justify-self: center; width: 78%; }
+@keyframes pop-in { from { transform: scale(0.9); opacity: 0; } }
+
+/* ---------- Forecast scene (Task 3) ---------- */
+.forecast { position: absolute; inset: 0; overflow-y: auto; background: var(--bg); }
+.scene {
+  position: relative;
+  height: 62vh;
+  min-height: 420px;
+  max-height: 560px;
+  background: var(--grad-sky);
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  overflow: hidden;
+}
+/* Soft hills and trees drawn with gradients, behind the companion. */
+.scene::before {
+  content: '';
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  top: 30%;
+  height: 22%;
+  background:
+    radial-gradient(ellipse 18% 70% at 12% 100%, #3f8f52 60%, transparent 62%),
+    radial-gradient(ellipse 14% 60% at 30% 100%, #4c9d5c 60%, transparent 62%),
+    radial-gradient(ellipse 20% 80% at 78% 100%, #3f8f52 60%, transparent 62%),
+    radial-gradient(ellipse 12% 55% at 92% 100%, #56a866 60%, transparent 62%);
+  opacity: 0.8;
+}
+.scene.level-high { background: linear-gradient(#d9d5dc 0%, #eceaf0 38%, #a6d38f 39%, #6cae66 100%); }
+.scene > * { position: relative; }
+.scene-back { position: absolute; top: 14px; left: 14px; z-index: 2; }
+.scene .glass-pill { margin-top: 88px; }
+.scene-companion { margin-top: 36px; }
+.scene-line {
+  margin-top: 6px;
+  max-width: 280px;
+  text-align: center;
+  color: #fff;
+  font-weight: 700;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+.sheet {
+  position: relative;
+  margin-top: -28px;
+  background: var(--bg);
+  border-radius: 28px 28px 0 0;
+  padding: 18px 16px calc(40px + env(safe-area-inset-bottom));
+  display: grid;
+  gap: 14px;
+}
+.sheet-handle { width: 44px; height: 5px; border-radius: 999px; background: var(--line); justify-self: center; }
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 10px rgba(20, 50, 45, 0.08);
+  padding: 16px;
+}
+.eyebrow { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--teal); }
+.tip-text { font-size: 1.05rem; font-weight: 700; margin-top: 4px; }
+.risk-summary { display: flex; align-items: center; gap: 14px; }
+
+.risk-ring { position: relative; width: 112px; height: 112px; flex: none; }
+.risk-ring-fill { transition: stroke-dasharray 1s ease; }
+.risk-ring-text { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; line-height: 1.1; }
+.risk-ring-text strong { font-size: 1.6rem; font-weight: 900; }
+.risk-ring-text span { font-size: 0.8rem; font-weight: 700; }
+
+.condition-chip {
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+  display: inline-block;
+}
+.condition-chip.level-low { background: var(--mint-soft); color: #1f6e56; }
+.condition-chip.level-moderate { background: var(--sun-soft); color: #8a5300; }
+.condition-chip.level-high { background: var(--coral-soft); color: #a3302a; }
+
+.learning-banner {
+  background: var(--mint-soft);
+  color: #1f6e56;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+}
+
+.factor-list { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 12px; }
+.factor-list li { display: grid; grid-template-columns: 36px 1fr; gap: 10px; align-items: center; }
+.factor-icon { width: 36px; height: 36px; border-radius: 12px; background: var(--bg); display: grid; place-items: center; font-size: 1.1rem; }
+.factor-head { display: flex; justify-content: space-between; gap: 8px; font-size: 0.92rem; }
+.factor-bar { height: 8px; background: var(--bg); border-radius: 999px; margin-top: 5px; overflow: hidden; }
+.factor-bar span { display: block; height: 100%; background: var(--coral); border-radius: 999px; }
+.explanation { margin-top: 12px; font-size: 0.92rem; color: var(--ink-soft); background: var(--bg); padding: 10px 12px; border-radius: var(--radius-sm); }
+.accuracy { font-size: 0.9rem; color: var(--ink-soft); }
+.accuracy strong { color: var(--ink); }
+.disclaimer { font-size: 0.8rem; color: var(--ink-soft); text-align: center; padding: 4px 12px; }
+
+/* ---------- Menu screens (check-in, triggers, profile) ---------- */
+.menu-screen {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  background: var(--grad-screen);
+  color: #fff;
+  padding: 24px 16px calc(110px + env(safe-area-inset-bottom));
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+.menu-screen .card { color: var(--ink); }
+.menu-screen .muted { color: rgba(255, 255, 255, 0.85); }
+.menu-screen .card .muted { color: var(--ink-soft); }
+.menu-screen-close {
+  position: fixed;
+  bottom: calc(22px + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+}
 .placeholder { display: grid; gap: 12px; }
+.map-credit {
+  justify-self: end;
+  align-self: end;
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.menu-screen-close { background: #fff; color: var(--teal); }

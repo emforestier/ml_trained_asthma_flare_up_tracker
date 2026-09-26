@@ -8,7 +8,7 @@
       "feature": "tree_pollen",
       "label": "Tree pollen",
       "value": 4.2,
-      "unit": "index 0-5",
+      "unit": "of 5",
       "impact": 0.21,
       "direction": "up"
     },
@@ -24,7 +24,7 @@
       "feature": "puffs_above_baseline",
       "label": "Extra rescue puffs",
       "value": 1,
-      "unit": "puffs above your usual",
+      "unit": "above usual",
       "impact": 0.06,
       "direction": "up"
     }

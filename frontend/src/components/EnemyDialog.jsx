@@ -40,11 +40,14 @@ export default function EnemyDialog({ zone, triggers, onClose }) {
       onConfirm={onClose}
       onCancel={() => navigate('/triggers')}
       onDismiss={onClose}
-    >
-      <div className="dialog-enemy">
-        <Enemy type={zone.type} level={zone.level} size={110} />
-      </div>
-      <p className="overlay-tag">Illustrative demo overlay, not measured neighborhood data</p>
-    </GameDialog>
+      media={
+        <>
+          <div className="dialog-enemy">
+            <Enemy type={zone.type} level={zone.level} size={110} />
+          </div>
+          <p className="overlay-tag">Illustrative demo overlay, not measured neighborhood data</p>
+        </>
+      }
+    />
   );
 }

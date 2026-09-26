@@ -1,7 +1,5 @@
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
-import { getLog } from './api';
 import AppLayout from './components/AppLayout';
-import Placeholder from './components/Placeholder';
 import CheckIn from './screens/CheckIn';
 import DesignPreview from './screens/DesignPreview';
 import Emergency from './screens/Emergency';
@@ -9,6 +7,7 @@ import Forecast from './screens/Forecast';
 import MapHome from './screens/MapHome';
 import Onboarding from './screens/Onboarding';
 import Patterns from './screens/Patterns';
+import Profile from './screens/Profile';
 import { GameProvider, useGame } from './state/GameContext';
 
 // First-time users see onboarding on every route until they finish it.
@@ -29,8 +28,9 @@ function Screens() {
       <Route element={<AppLayout />}>
         <Route path="check-in" element={<CheckIn />} />
         <Route path="triggers" element={<Patterns />} />
-        <Route path="profile" element={<Placeholder title="Profile" milestone="Sat 8 PM" loader={getLog} endpoint="log" />} />
       </Route>
+      <Route path="profile" element={<Profile />} />
+      <Route path="profile/edit" element={<Onboarding mode="edit" />} />
       <Route path="emergency" element={<Emergency />} />
       <Route path="design" element={<DesignPreview />} />
       <Route path="*" element={<Navigate to="/" replace />} />

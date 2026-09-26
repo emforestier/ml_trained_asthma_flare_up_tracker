@@ -16,14 +16,21 @@ import { DEMO_USER_ID } from '../survey';
 
 const STORAGE_KEY = 'breezy-state-v2';
 
-export const BADGES = [
-  { id: 'first', icon: '🌱', name: 'First breath', description: 'Finish your first check-in', earned: (g) => g.checkIns >= 1 },
-  { id: 'streak3', icon: '🔥', name: 'On a roll', description: 'Check in 3 days in a row', earned: (g) => g.bestStreak >= 3 },
-  { id: 'streak7', icon: '⭐', name: 'Week warrior', description: 'Check in 7 days in a row', earned: (g) => g.bestStreak >= 7 },
-  { id: 'pattern', icon: '🧠', name: 'Pattern unlocked', description: 'Log 14 days so your baseline is fully personal', earned: (g) => g.checkIns >= 14 },
-  { id: 'feedback', icon: '🎯', name: 'Truth teller', description: 'Tell us 5 times whether a flare-up happened', earned: (g) => g.feedbackCount >= 5 },
-  { id: 'explorer', icon: '🗺️', name: 'Air explorer', description: 'Open the air map', earned: (g) => g.visitedMap },
+// Medals with bronze, silver and gold tiers, earned by showing up (never by having fewer
+// symptoms or using less medication).
+export const MEDAL_TIERS = ['Bronze', 'Silver', 'Gold'];
+export const MEDALS = [
+  { id: 'streak', icon: '🔥', name: 'Streak keeper', unit: 'day streak', stat: (g) => g.bestStreak, tiers: [3, 7, 30] },
+  { id: 'checkins', icon: '📅', name: 'Check-in pro', unit: 'check-ins', stat: (g) => g.checkIns, tiers: [7, 14, 30] },
+  { id: 'feedback', icon: '🎯', name: 'Truth teller', unit: 'answers', stat: (g) => g.feedbackCount, tiers: [3, 10, 25] },
+  { id: 'level', icon: '⭐', name: 'Rising star', unit: 'level', stat: (g) => levelInfo(g.xp).level, tiers: [3, 5, 10] },
 ];
+
+// How many tiers of a medal are earned: 0 (none) to 3 (gold).
+export function medalTier(medal, game) {
+  const value = medal.stat(game);
+  return medal.tiers.filter((needed) => value >= needed).length;
+}
 
 // Local date (YYYY-MM-DD) in the team's city time zone, offset by whole days.
 export function todayString(offsetDays = 0) {
@@ -119,7 +126,9 @@ export function levelInfo(xp) {
   };
 }
 
-const earnedIds = (game) => BADGES.filter((badge) => badge.earned(game)).map((badge) => badge.id);
+// One id per earned medal tier, for example "streak-2" for silver.
+const earnedIds = (game) =>
+  MEDALS.flatMap((medal) => Array.from({ length: medalTier(medal, game) }, (_, tier) => `${medal.id}-${tier + 1}`));
 
 const GameContext = createContext(null);
 
@@ -141,6 +150,11 @@ export function GameProvider({ children }) {
       profile: { ...previous.profile, ...profile, onboarded: true },
       game: previous.profile.onboarded ? previous.game : EMPTY_GAME,
     }));
+  }, []);
+
+  // Saves edited survey answers without touching progress or demo status.
+  const updateProfile = useCallback((changes) => {
+    setState((previous) => ({ ...previous, profile: { ...previous.profile, ...changes } }));
   }, []);
 
   const reset = useCallback(() => setState({ profile: EMPTY_PROFILE, game: EMPTY_GAME }), []);
@@ -176,7 +190,13 @@ export function GameProvider({ children }) {
         xpBefore: game.xp,
         xpAfter: next.xp,
         leveledUp: levelInfo(next.xp).level > levelInfo(game.xp).level,
-        newBadges: BADGES.filter((badge) => badge.earned(next) && !before.includes(badge.id)),
+        newBadges: earnedIds(next)
+          .filter((id) => !before.includes(id))
+          .map((id) => {
+            const [medalId, tier] = id.split('-');
+            const medal = MEDALS.find((item) => item.id === medalId);
+            return { id, icon: medal.icon, name: `${MEDAL_TIERS[tier - 1]} ${medal.name}` };
+          }),
       };
     },
     [state.game],
@@ -215,8 +235,8 @@ export function GameProvider({ children }) {
   }, []);
 
   const value = useMemo(
-    () => ({ ...state, startDemo, finishOnboarding, reset, recordCheckIn, recordFeedback, markAlertsSeen, markMapVisited }),
-    [state, startDemo, finishOnboarding, reset, recordCheckIn, recordFeedback, markAlertsSeen, markMapVisited],
+    () => ({ ...state, startDemo, finishOnboarding, updateProfile, reset, recordCheckIn, recordFeedback, markAlertsSeen, markMapVisited }),
+    [state, startDemo, finishOnboarding, updateProfile, reset, recordCheckIn, recordFeedback, markAlertsSeen, markMapVisited],
   );
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;

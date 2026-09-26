@@ -1,5 +1,7 @@
 // "Meet your companion": the first-run survey, one question per screen, asked by the companion.
+// With mode="edit" it reopens the same questions, pre-filled, to change answers from the profile.
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { saveProfile } from '../api';
 import Companion from '../components/Companion';
 import { DEFAULT_COMPANION_NAME, DISCLAIMER } from '../config';
@@ -15,10 +17,14 @@ function isAnswered(question, answers) {
   return Boolean(value);
 }
 
-export default function Onboarding() {
-  const { startDemo, finishOnboarding } = useGame();
-  const [answers, setAnswers] = useState(EMPTY_ANSWERS);
-  const [step, setStep] = useState('intro'); // 'intro', a question index, or 'done'
+export default function Onboarding({ mode = 'create' }) {
+  const editing = mode === 'edit';
+  const navigate = useNavigate();
+  const { profile: savedProfile, startDemo, finishOnboarding, updateProfile } = useGame();
+  const [answers, setAnswers] = useState(() =>
+    editing ? { ...EMPTY_ANSWERS, ...savedProfile.survey, triggers: savedProfile.survey?.triggers || [] } : EMPTY_ANSWERS,
+  );
+  const [step, setStep] = useState(editing ? 0 : 'intro'); // 'intro', a question index, or 'done'
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
 
@@ -28,7 +34,11 @@ export default function Onboarding() {
 
   const set = (id, value) => setAnswers((previous) => ({ ...previous, [id]: value }));
   const next = () => setStep(index + 1 < visible.length ? index + 1 : 'done');
-  const back = () => setStep(index > 0 ? index - 1 : 'intro');
+  const back = () => {
+    if (index > 0) setStep(index - 1);
+    else if (editing) navigate('/profile');
+    else setStep('intro');
+  };
 
   async function finish() {
     setSaving(true);
@@ -38,13 +48,13 @@ export default function Onboarding() {
       puffsPerDay: answers.rescueDays === NO_RESCUE_DAYS ? ZERO_PUFFS : answers.puffsPerDay,
     };
     const profile = {
-      user: DEMO_USER_ID,
+      user: editing ? savedProfile.user : DEMO_USER_ID,
       nickname: survey.nickname,
       city: survey.city,
       companionName: DEFAULT_COMPANION_NAME,
       survey,
       baselineEstimate: baselineEstimate(survey),
-      isDemo: false,
+      isDemo: editing ? savedProfile.isDemo : false,
     };
     setSaveError(null);
     const saved = await saveProfile({
@@ -58,6 +68,11 @@ export default function Onboarding() {
     setSaving(false);
     if (!saved.ok) {
       setSaveError("Couldn't save your profile. Check your connection and try again.");
+      return;
+    }
+    if (editing) {
+      updateProfile(profile);
+      navigate('/profile');
       return;
     }
     finishOnboarding(profile);
@@ -93,10 +108,16 @@ export default function Onboarding() {
         </div>
         <div className="speech-card">
           <p className="speaker">{DEFAULT_COMPANION_NAME}</p>
-          <p>
-            Nice to meet you, <strong>{answers.nickname.trim()}</strong>! I'll keep an eye on the air around {answers.city} and learn your
-            patterns as you check in each day.
-          </p>
+          {editing ? (
+            <p>
+              All set, <strong>{answers.nickname.trim()}</strong>. Save your updated answers?
+            </p>
+          ) : (
+            <p>
+              Nice to meet you, <strong>{answers.nickname.trim()}</strong>! I'll keep an eye on the air around {answers.city} and learn
+              your patterns as you check in each day.
+            </p>
+          )}
           <p className="muted">{DISCLAIMER}</p>
         </div>
         {saveError && (
@@ -106,7 +127,7 @@ export default function Onboarding() {
         )}
         <div className="onboarding-actions">
           <button className="pill-button" onClick={finish} disabled={saving}>
-            {saving ? 'Saving…' : saveError ? 'Try again' : 'Start'}
+            {saving ? 'Saving…' : saveError ? 'Try again' : editing ? 'Save' : 'Start'}
           </button>
           <button className="text-button" onClick={() => setStep(visible.length - 1)} disabled={saving}>
             Back

@@ -1,0 +1,87 @@
+/* ---------- Design tokens ----------
+   Art style: soft, rounded and friendly, like a pocket pet game. Warm cream background,
+   white cards with big radii, one chunky rounded font (Nunito).
+   Risk colors are reserved for risk: mint = low, sun = moderate, coral = high. */
+:root {
+  --bg: #f7f4ee;
+  --card: #ffffff;
+  --ink: #1f2a37;
+  --ink-soft: #5b6573;
+  --line: #e7e2d8;
+
+  --sky: #3e7cb1;       /* primary actions, links */
+  --sky-soft: #e3eef8;
+  --mint: #3fae8c;      /* low risk, success */
+  --mint-soft: #dcf2ea;
+  --sun: #f0a92e;       /* moderate risk, XP, streaks */
+  --sun-soft: #fdf0d5;
+  --coral: #e2574c;     /* high risk */
+  --coral-soft: #fbe3e0;
+  --lav: #8a78e0;       /* game accents: levels, badges */
+  --lav-soft: #ece8fc;
+
+  --pollen: #e8b923;
+  --air: #7d8ea3;
+  --weather: #4f9bd9;
+
+  --radius: 22px;
+  --radius-sm: 14px;
+  --shadow: 0 6px 20px rgba(31, 42, 55, 0.08);
+  --font: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --nav-height: 76px;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { margin: 0; min-height: 100%; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { margin: 0; line-height: 1.2; font-weight: 900; }
+h1 { font-size: 1.6rem; }
+h2 { font-size: 1.2rem; }
+h3 { font-size: 1rem; font-weight: 800; }
+p { margin: 0; }
+button { font-family: inherit; }
+
+/* ---------- Companion ---------- */
+.companion { display: block; overflow: visible; }
+.companion .body { transition: fill 0.4s ease; }
+
+.companion.mood-happy .bob { animation: bounce 2.4s ease-in-out infinite; }
+.companion.mood-uneasy .bob { animation: sway 3s ease-in-out infinite; transform-origin: 100px 150px; }
+.companion.mood-worried .bob { animation: shiver 0.5s linear infinite; }
+.companion .shadow { animation: shadow-pulse 2.4s ease-in-out infinite; transform-origin: 100px 188px; }
+.companion .blink { animation: blink 4.5s infinite; transform-origin: center; transform-box: fill-box; }
+.companion .sweat { animation: drip 1.6s ease-in infinite; }
+.companion .sprout { animation: wiggle 3.2s ease-in-out infinite; transform-origin: 100px 42px; }
+
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+@keyframes sway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+@keyframes shiver { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-1.5px); } 75% { transform: translateX(1.5px); } }
+@keyframes shadow-pulse { 0%, 100% { transform: scaleX(1); opacity: 0.18; } 50% { transform: scaleX(0.86); opacity: 0.12; } }
+@keyframes blink { 0%, 94%, 100% { transform: scaleY(1); } 97% { transform: scaleY(0.1); } }
+@keyframes drip { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(14px); opacity: 0; } }
+@keyframes wiggle { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ---------- Design preview (Task 1) ---------- */
+.design { max-width: 440px; margin: 0 auto; padding: 24px 16px 48px; display: grid; gap: 20px; }
+.design .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px; }
+.design .muted { color: var(--ink-soft); font-size: 0.92rem; }
+.mood-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; margin-top: 12px; }
+.mood-row .tag { font-weight: 800; font-size: 0.85rem; margin-top: 4px; }
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; margin-top: 12px; }
+.swatch { border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--line); font-size: 0.78rem; }
+.swatch .chip { height: 44px; }
+.swatch .name { padding: 6px 8px; font-weight: 700; }

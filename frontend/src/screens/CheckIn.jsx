@@ -3,7 +3,9 @@
 // moment an emergency sign is selected, without finishing the quest or waiting on the backend.
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { saveLog } from '../api';
+import { buildTriggerAlerts } from '../alerts';
+import { getEnvironment, getTriggers, saveLog, useApi } from '../api';
+import AlertToast from '../components/AlertToast';
 import Companion from '../components/Companion';
 import StreakCard from '../components/StreakCard';
 import UrgentNotice from '../components/UrgentNotice';
@@ -16,6 +18,7 @@ import {
   XP_PER_STREAK_DAY,
   XP_STREAK_CARD_BONUS,
 } from '../config';
+import { sendSystemNotification } from '../notify';
 import { currentStreak, levelInfo, todayString, useGame } from '../state/GameContext';
 
 const OBJECTIVES = [
@@ -98,7 +101,19 @@ function SaveNote({ mock }) {
   return mock ? <p className="save-note">Demo save: stored in this browser only.</p> : <p className="save-note">Saved.</p>;
 }
 
-function Reward({ reward, companionName, mock }) {
+// Cautions raised by this check-in, shown on the reward and update screens.
+function CheckInAlerts({ alerts }) {
+  if (!alerts?.length) return null;
+  return (
+    <div className="checkin-alerts">
+      {alerts.map((alert) => (
+        <AlertToast key={alert.id} alert={alert} inline />
+      ))}
+    </div>
+  );
+}
+
+function Reward({ reward, companionName, mock, alerts }) {
   const xp = useCountUp(reward.xpGained);
   const { level } = levelInfo(reward.xpAfter);
   return (
@@ -115,6 +130,7 @@ function Reward({ reward, companionName, mock }) {
           {badge.icon} New badge: {badge.name}
         </p>
       ))}
+      <CheckInAlerts alerts={alerts} />
       <StreakCard streak={reward.streak} checkedInToday justStamped />
       <SaveNote mock={mock} />
       <p className="muted">{companionName} will use today's check-in to learn your patterns.</p>
@@ -125,7 +141,7 @@ function Reward({ reward, companionName, mock }) {
   );
 }
 
-function Updated({ streak, mock }) {
+function Updated({ streak, mock, alerts }) {
   return (
     <div className="quest">
       <h1>Daily quest</h1>
@@ -135,6 +151,7 @@ function Updated({ streak, mock }) {
         <p className="muted">Your streak already counts today, so there's no extra XP for updating.</p>
         <SaveNote mock={mock} />
       </section>
+      <CheckInAlerts alerts={alerts} />
       <StreakCard streak={streak} checkedInToday />
       <Link to="/" className="pill-button as-link" style={{ justifySelf: 'center' }}>
         Back to the map
@@ -145,7 +162,9 @@ function Updated({ streak, mock }) {
 
 export default function CheckIn() {
   const navigate = useNavigate();
-  const { profile, game, recordCheckIn } = useGame();
+  const { profile, game, recordCheckIn, markAlertsSeen } = useGame();
+  const environment = useApi(getEnvironment);
+  const triggers = useApi(getTriggers);
   const previous = game.lastCheckInDate === todayString() ? game.todayEntry : null;
   const [editing, setEditing] = useState(false);
   const [step, setStep] = useState(0);
@@ -165,8 +184,8 @@ export default function CheckIn() {
   const potentialXp = XP_PER_CHECK_IN + XP_PER_STREAK_DAY * (streak + 1) + (fillsCard ? XP_STREAK_CARD_BONUS : 0);
   const emergencySigns = signs.filter((sign) => sign !== NONE_OF_THESE);
 
-  if (result?.reward?.updated) return <Updated streak={streak} mock={result.mock} />;
-  if (result) return <Reward reward={result.reward} companionName={profile.companionName} mock={result.mock} />;
+  if (result?.reward?.updated) return <Updated streak={streak} mock={result.mock} alerts={result.alerts} />;
+  if (result) return <Reward reward={result.reward} companionName={profile.companionName} mock={result.mock} alerts={result.alerts} />;
 
   if (checkedInToday && !editing) {
     const entry = game.todayEntry;
@@ -221,7 +240,18 @@ export default function CheckIn() {
       navigate('/emergency');
       return;
     }
-    setResult({ reward, mock: saved.mock });
+    // Caution the user if they logged symptoms while one of their triggers is high nearby.
+    const alerts = buildTriggerAlerts({
+      environment: environment.data,
+      triggers: triggers.data?.triggers,
+      profile,
+      game,
+      entry,
+      date: entry.date,
+    });
+    alerts.forEach(sendSystemNotification);
+    markAlertsSeen(alerts.map((alert) => alert.id));
+    setResult({ reward, mock: saved.mock, alerts });
   }
 
   function toggleSign(sign) {

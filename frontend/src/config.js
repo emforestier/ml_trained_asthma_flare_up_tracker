@@ -58,6 +58,10 @@ export const CONDITION_ALERTS = {
   aqiModerate: 51,
   pressureDropHigh: -6, // hPa in 24h
   pressureDropModerate: -3,
+  humidityHigh: 80, // %
+  humidityModerate: 70,
+  coldHighC: 5, // °C and below
+  coldModerateC: 10,
 };
 
 // Streak stamp card: one stamp per daily check-in, with a bonus when the card fills.

@@ -42,6 +42,7 @@ const EMPTY_GAME = {
   lastFeedbackDate: null,
   accuracy: { correct: 0, total: 0 },
   visitedMap: false,
+  alertsSeen: { date: null, ids: [] },
 };
 
 // The demo user arrives with three weeks of history, checked in through yesterday.
@@ -103,6 +104,11 @@ function loadState() {
 // The streak still counts only if the last check-in was today or yesterday.
 export function currentStreak(game) {
   return game.lastCheckInDate === todayString() || game.lastCheckInDate === todayString(-1) ? game.streak : 0;
+}
+
+// Alert ids already shown today.
+export function alertsSeenToday(game) {
+  return game.alertsSeen?.date === todayString() ? game.alertsSeen.ids : [];
 }
 
 export function levelInfo(xp) {
@@ -194,13 +200,23 @@ export function GameProvider({ children }) {
     });
   }, []);
 
+  // Remembers which trigger alerts were shown today so each appears at most once a day.
+  const markAlertsSeen = useCallback((ids) => {
+    const today = todayString();
+    setState((previous) => {
+      const seen = previous.game.alertsSeen?.date === today ? previous.game.alertsSeen.ids : [];
+      const merged = [...new Set([...seen, ...ids])];
+      return { ...previous, game: { ...previous.game, alertsSeen: { date: today, ids: merged } } };
+    });
+  }, []);
+
   const markMapVisited = useCallback(() => {
     setState((previous) => (previous.game.visitedMap ? previous : { ...previous, game: { ...previous.game, visitedMap: true } }));
   }, []);
 
   const value = useMemo(
-    () => ({ ...state, startDemo, finishOnboarding, reset, recordCheckIn, recordFeedback, markMapVisited }),
-    [state, startDemo, finishOnboarding, reset, recordCheckIn, recordFeedback, markMapVisited],
+    () => ({ ...state, startDemo, finishOnboarding, reset, recordCheckIn, recordFeedback, markAlertsSeen, markMapVisited }),
+    [state, startDemo, finishOnboarding, reset, recordCheckIn, recordFeedback, markAlertsSeen, markMapVisited],
   );
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;

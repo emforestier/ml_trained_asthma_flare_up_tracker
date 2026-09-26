@@ -41,3 +41,13 @@ Reads take `?user=<id>` (the fictional demo user is `demo-user-1`). The mock fil
 The backend needs CORS enabled for `http://localhost:5173`.
 
 The frontend only shows a save as successful when the POST returns a 2xx response. Requests time out after 8 seconds.
+
+## Trigger alerts
+
+`src/alerts.js` cautions the user when one of their triggers is high near them today, for example high synthetic pollen for someone whose predictions pollen strongly influences. It combines:
+
+- **The model's trigger profile** (`triggers.json`: `feature`, `strength`, `discovered`). Strong triggers alert on moderate or high conditions; moderate triggers on high only; weak ones never. Emily: keep the `feature` names `pollen`, `air_quality`, `pressure_drop`, `humidity` and `cold_air`.
+- **Today's conditions** (`environment.json` `current`). Thresholds are in `CONDITION_ALERTS` in `src/config.js`.
+- **Reported triggers** from onboarding, used instead of the model until the user has 14 days of check-ins.
+
+If a check-in logs symptoms while a trigger is high, the alert says so. Each alert shows at most once a day, as a banner on the map and, if the user allows it, as a system notification. System notifications only work while the app is open or in a background tab; alerts with the app closed would need the backend to send push messages.

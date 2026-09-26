@@ -1,10 +1,12 @@
 // Home: a tilted game-world map. The companion stands at the user's location, and nearby
 // triggers (pollen, weather, air quality) appear as animated enemies when you zoom in.
 import 'leaflet/dist/leaflet.css';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Circle, MapContainer, TileLayer } from 'react-leaflet';
 import { Link, useNavigate } from 'react-router-dom';
+import { buildTriggerAlerts } from '../alerts';
 import { getEnvironment, getLog, getRisk, getTriggers, useApi } from '../api';
+import AlertToast from '../components/AlertToast';
 import Companion from '../components/Companion';
 import ConditionChip from '../components/ConditionChip';
 import EnemyDialog from '../components/EnemyDialog';
@@ -15,7 +17,8 @@ import NearbyPanel from '../components/NearbyPanel';
 import TrainerBadge from '../components/TrainerBadge';
 import { RISK_LEVELS, USE_MOCK, levelFromScore } from '../config';
 import { distanceKm } from '../geo';
-import { currentStreak, todayString, useGame } from '../state/GameContext';
+import { sendSystemNotification } from '../notify';
+import { alertsSeenToday, currentStreak, todayString, useGame } from '../state/GameContext';
 
 const DEFAULT_CENTER = { lat: 29.6516, lon: -82.3248 };
 const DEFAULT_ZOOM = 15;
@@ -28,7 +31,7 @@ const TILT_STYLE = { transform: `perspective(${MAP_PERSPECTIVE_PX}px) rotateX(${
 
 export default function MapHome() {
   const navigate = useNavigate();
-  const { profile, game } = useGame();
+  const { profile, game, markAlertsSeen } = useGame();
   const risk = useApi(getRisk);
   const environment = useApi(getEnvironment);
   const triggers = useApi(getTriggers);
@@ -58,6 +61,28 @@ export default function MapHome() {
   // Only ask about yesterday once the user has a yesterday in the app.
   const hasHistory = profile.isDemo || game.checkIns > 0;
   const askFeedback = hasHistory && log.data?.last_prediction && feedbackOpen && !menuOpen && !selectedZone;
+
+  // Trigger alerts the user hasn't seen today. One shows at a time, and only when no dialog is open.
+  const alerts = useMemo(
+    () =>
+      buildTriggerAlerts({
+        environment: environment.data,
+        triggers: triggers.data?.triggers,
+        profile,
+        game,
+        entry: game.lastCheckInDate === todayString() ? game.todayEntry : null,
+        date: todayString(),
+      }),
+    [environment.data, triggers.data, profile, game],
+  );
+  const seen = alertsSeenToday(game);
+  const pendingAlerts = alerts.filter((alert) => !seen.includes(alert.id));
+  const currentAlert = !askFeedback && !menuOpen && !selectedZone ? pendingAlerts[0] : null;
+
+  // Also send it as a system notification, if the user allowed them.
+  useEffect(() => {
+    if (currentAlert) sendSystemNotification(currentAlert);
+  }, [currentAlert?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function mapReady(instance) {
     if (!instance || instance === map) return;
@@ -154,6 +179,21 @@ export default function MapHome() {
       </div>
 
       {zoom < MIN_ENEMY_ZOOM && <p className="zoom-hint">Zoom in to find triggers</p>}
+
+      {currentAlert && (
+        <div className="alert-slot">
+          <AlertToast
+            key={currentAlert.id}
+            alert={currentAlert}
+            remaining={pendingAlerts.length - 1}
+            onDismiss={() => markAlertsSeen([currentAlert.id])}
+            onOpen={() => {
+              markAlertsSeen([currentAlert.id]);
+              navigate('/forecast');
+            }}
+          />
+        </div>
+      )}
 
       <div className="hud-bottom">
         <TrainerBadge />

@@ -1,0 +1,16 @@
+{
+  "user": "demo-user-1",
+  "nickname": "Sam",
+  "city": "Gainesville, FL",
+  "companion_name": "Breezy",
+  "survey": {
+    "nickname": "Sam",
+    "city": "Gainesville, FL",
+    "rescueDays": "1–2 days",
+    "puffsPerDay": "2 puffs",
+    "nightWaking": "Once or twice in the past four weeks",
+    "controller": "Yes",
+    "preExercise": "Yes"
+  },
+  "baseline_estimate": 0.43
+}

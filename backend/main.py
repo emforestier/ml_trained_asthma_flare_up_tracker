@@ -1,158 +1,72 @@
-from datetime import date
+import json
+from pathlib import Path
+from datetime import date as Date
 from pydantic import BaseModel, Field, model_validator
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 
 app = FastAPI()
+CONTRACTS_DIR = (
+    Path(__file__).resolve().parent.parent / "contracts"
+)
+
+
+def load_sample(name):
+    file_path = CONTRACTS_DIR / f"{name}.json"
+
+    with file_path.open(encoding="utf-8-sig") as file:
+        return json.load(file)
 
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
 @app.get("/environment")
-def get_environment():
-    return {
-        "city": "Demo city",
-        "date": "2026-09-26",
-        "data_mode": "mock",
-        "weather": {
-            "temperature_c": 24,
-            "humidity_percent": 60,
-            "pressure_hpa": 1012,
-            "wind_speed_kmh": 12,
-            "rain_mm": 0,
-            "source": "sample data",
-            "is_synthetic": True
-        },
-        "air_quality": {
-            "pm2_5": 12,
-            "unit": "micrograms per cubic meter",
-            "source": "sample data",
-            "is_synthetic": True
-        },
-        "pollen": {
-            "tree": 2,
-            "grass": 4,
-            "weed": 1,
-            "scale": "0 to 5 internal demo scale",
-            "source": "synthetic demo data",
-            "is_synthetic": True
-        }
-    }
+def get_environment(user: str = "demo-user-1"):
+    return load_sample("environment")
+
 
 @app.get("/risk")
-def get_risk():
-    return {
-        "user_id": "demo-user-1",
-        "prediction_for": "2026-09-27",
-        "risk_score": 0.62,
-        "risk_level": "elevated",
-        "top_factors": [
-            {
-                "name": "Pollen",
-                "direction": "increases",
-                "strength": "strong"
-            },
-            {
-                "name": "Weather",
-                "direction": "increases",
-                "strength": "moderate"
-            },
-            {
-                "name": "Air quality",
-                "direction": "increases",
-                "strength": "weak"
-            }
-        ],
-        "recommendation": "Review your existing asthma action plan.",
-        "data_mode": "mock",
-        "model_status": "not_connected",
-        "disclaimer": (
-            "This is a fixed sample prediction for testing the interface. "
-            "It is not a medical assessment."
-        )
-    }
+def get_risk(user: str = "demo-user-1"):
+    return load_sample("risk")
+
 
 @app.get("/triggers")
-def get_triggers():
-    return {
-        "user_id": "demo-user-1",
-        "title": "Environmental patterns",
-        "data_mode": "mock",
-        "model_status": "not_connected",
-        "patterns": [
-            {
-                "factor": "pollen",
-                "label": "Pollen",
-                "strength": "strong",
-                "description": (
-                    "Placeholder: pollen has a strong influence "
-                    "in this example."
-                )
-            },
-            {
-                "factor": "weather",
-                "label": "Weather",
-                "strength": "moderate",
-                "description": (
-                    "Placeholder: weather has a moderate influence "
-                    "in this example."
-                )
-            },
-            {
-                "factor": "air_quality",
-                "label": "Air quality",
-                "strength": "weak",
-                "description": (
-                    "Placeholder: air quality has a weak influence "
-                    "in this example."
-                )
-            }
-        ],
-        "disclaimer": (
-            "These are sample patterns for testing the interface. "
-            "They are not learned from a person's health history "
-            "and do not establish medical causes."
-        )
-    }
+def get_triggers(user: str = "demo-user-1"):
+    return load_sample("triggers")
+
 
 @app.get("/summary")
-def get_summary():
-    return {
-        "user_id": "demo-user-1",
-        "title": "Weekly environmental summary",
-        "period_start": "2026-09-20",
-        "period_end": "2026-09-26",
-        "data_mode": "mock",
-        "model_status": "not_connected",
-        "summary": (
-            "This example shows how your weekly summary will look. "
-            "Once connected, it will summarize your recorded check-ins "
-            "and the model's weather, pollen, and air-quality patterns."
-        ),
-        "days_logged": 0,
-        "disclaimer": (
-            "This is placeholder text. No health history has been "
-            "analyzed, and Gemini is not connected yet."
-        )
-    }
-class DailyLog(BaseModel):
-    user_id: str = Field(min_length=1)
-    log_date: date
+def get_summary(user: str = "demo-user-1"):
+    return load_sample("summary")
 
-    total_rescue_puffs: int = Field(ge=0, strict=True)
-    pre_exercise_puffs: int = Field(ge=0, strict=True)
 
-    shortness_of_breath: int = Field(ge=0, le=3, strict=True)
-    wheezing_or_chest_tightness: int = Field(
-        ge=0, le=3, strict=True
-    )
+@app.get("/log")
+def get_log(user: str = "demo-user-1"):
+    return load_sample("log")
+
+
+
+
+class Symptoms(BaseModel):
+    breath: int = Field(ge=0, le=3, strict=True)
+    wheeze: int = Field(ge=0, le=3, strict=True)
     cough: int = Field(ge=0, le=3, strict=True)
 
+
+class DailyLog(BaseModel):
+    user: str = Field(min_length=1)
+    date: Date
+
+    puffs: int = Field(ge=0, strict=True)
+    pre_exercise_puffs: int = Field(ge=0, strict=True)
+
+    symptoms: Symptoms
     night_waking: bool = Field(strict=True)
+    emergency_signs: list[str] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def check_puff_counts(self):
-        if self.pre_exercise_puffs > self.total_rescue_puffs:
+        if self.pre_exercise_puffs > self.puffs:
             raise ValueError(
                 "Pre-exercise puffs cannot exceed total rescue puffs."
             )
@@ -161,24 +75,91 @@ class DailyLog(BaseModel):
 
 @app.post("/log")
 def receive_log(log: DailyLog):
-    eligible_puffs = (
-        log.total_rescue_puffs - log.pre_exercise_puffs
-    )
+    eligible_puffs = log.puffs - log.pre_exercise_puffs
 
     symptom_total = (
-        log.shortness_of_breath
-        + log.wheezing_or_chest_tightness
-        + log.cough
+        log.symptoms.breath
+        + log.symptoms.wheeze
+        + log.symptoms.cough
     )
 
-    return {
-        "status": "validated_not_saved",
-        "saved": False,
-        "message": (
-            "Check-in received and validated. "
-            "Permanent storage is not connected yet."
-        ),
-        "log": log.model_dump(mode="json"),
-        "eligible_rescue_puffs": eligible_puffs,
-        "symptom_total": symptom_total
-    }
+    # Step 3 checks the request format.
+    # Storage will be connected in a later step.
+    raise HTTPException(
+        status_code=501,
+        detail={
+            "status": "validated_not_saved",
+            "saved": False,
+            "message": (
+                "Check-in format is valid, but storage "
+                "is not connected yet."
+            ),
+            "received": log.model_dump(mode="json"),
+            "eligible_rescue_puffs": eligible_puffs,
+            "symptom_total": symptom_total
+        }
+    )
+
+class SurveyAnswers(BaseModel):
+    nickname: str = Field(min_length=1, max_length=20)
+    city: str = Field(min_length=1)
+    rescueDays: str = Field(min_length=1)
+    puffsPerDay: str = Field(min_length=1)
+    nightWaking: str = Field(min_length=1)
+    controller: str = Field(min_length=1)
+    preExercise: str = Field(min_length=1)
+
+
+class ProfileRequest(BaseModel):
+    user: str = Field(min_length=1)
+    nickname: str = Field(min_length=1, max_length=20)
+    city: str = Field(min_length=1)
+    companion_name: str = Field(min_length=1)
+    survey: SurveyAnswers
+    baseline_estimate: float | None = Field(
+        default=None,
+        ge=0,
+        allow_inf_nan=False
+    )
+
+
+@app.post("/profile")
+def receive_profile(profile: ProfileRequest):
+    raise HTTPException(
+        status_code=501,
+        detail={
+            "status": "validated_not_saved",
+            "saved": False,
+            "message": (
+                "Profile format is valid, but storage "
+                "is not connected yet."
+            ),
+            "received": profile.model_dump(mode="json")
+        }
+    )
+
+class FeedbackRequest(BaseModel):
+    user: str = Field(min_length=1)
+    date: Date
+    predicted_risk: float = Field(
+        ge=0,
+        le=1,
+        allow_inf_nan=False
+    )
+    had_flare_up: bool = Field(strict=True)
+
+
+@app.post("/feedback")
+def receive_feedback(feedback: FeedbackRequest):
+    raise HTTPException(
+        status_code=501,
+        detail={
+            "status": "validated_not_saved",
+            "saved": False,
+            "message": (
+                "Feedback format is valid, but storage "
+                "is not connected yet."
+            ),
+            "received": feedback.model_dump(mode="json")
+        }
+    )

@@ -1,10 +1,13 @@
 {
-  "user_id": "demo-user-1",
-  "log_date": "2026-09-26",
-  "total_rescue_puffs": 3,
+  "user": "demo-user-1",
+  "date": "2026-09-26",
+  "puffs": 3,
   "pre_exercise_puffs": 1,
-  "shortness_of_breath": 1,
-  "wheezing_or_chest_tightness": 1,
-  "cough": 0,
-  "night_waking": false
+  "symptoms": {
+    "breath": 1,
+    "wheeze": 1,
+    "cough": 0
+  },
+  "night_waking": false,
+  "emergency_signs": []
 }

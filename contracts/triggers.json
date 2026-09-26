@@ -1,29 +1,47 @@
-	
-
-{
+﻿{
   "user_id": "demo-user-1",
-  "title": "Environmental patterns",
-  "data_mode": "mock",
-  "model_status": "not_connected",
-  "patterns": [
+  "updated": "2026-09-27",
+  "data_mode": "demo",
+  "triggers": [
     {
-      "factor": "pollen",
+      "feature": "pollen",
       "label": "Pollen",
       "strength": "strong",
-      "description": "Placeholder: pollen has a strong influence in this example."
+      "score": 0.42,
+      "discovered": true,
+      "evidence": "Synthetic pollen was high the day before 4 of your 5 recorded flare-up days this month."
     },
     {
-      "factor": "weather",
-      "label": "Weather",
+      "feature": "pressure_drop",
+      "label": "Pressure drops",
       "strength": "moderate",
-      "description": "Placeholder: weather has a moderate influence in this example."
+      "score": 0.23,
+      "discovered": true,
+      "evidence": "Drops of 6 hPa or more in a day were followed by higher demo scores."
     },
     {
-      "factor": "air_quality",
+      "feature": "air_quality",
       "label": "Air quality",
       "strength": "weak",
-      "description": "Placeholder: air quality has a weak influence in this example."
+      "score": 0.09,
+      "discovered": true,
+      "evidence": "Poorer air quality days nudged demo scores up slightly."
+    },
+    {
+      "feature": "humidity",
+      "label": "Humidity",
+      "strength": "none",
+      "score": 0.0,
+      "discovered": false,
+      "evidence": "Not enough humid days recorded yet to tell."
+    },
+    {
+      "feature": "cold_air",
+      "label": "Cold air",
+      "strength": "none",
+      "score": 0.0,
+      "discovered": false,
+      "evidence": "No cold days recorded yet."
     }
-  ],
-  "disclaimer": "These are sample patterns for testing the interface. They are not learned from a person's health history and do not establish medical causes."
+  ]
 }

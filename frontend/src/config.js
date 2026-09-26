@@ -44,3 +44,17 @@ export const CONDITION_ALERTS = {
   pressureDropHigh: -6, // hPa in 24h
   pressureDropModerate: -3,
 };
+
+// Streak stamp card: one stamp per daily check-in, with a bonus when the card fills.
+export const STREAK_CARD_DAYS = 7;
+export const XP_STREAK_CARD_BONUS = 100;
+
+// Daily symptom check-in scale (0 = none ... 3 = severe), from the planning notes.
+export const SYMPTOM_LEVELS = ['None', 'Mild', 'Moderate', 'Severe'];
+export const SYMPTOMS = [
+  { id: 'breath', label: 'Shortness of breath' },
+  { id: 'wheeze', label: 'Wheezing or chest tightness' },
+  { id: 'cough', label: 'Cough' },
+];
+// Any of these sends the user to the urgent-care screen instead of the quest reward.
+export const EMERGENCY_SIGNS = ['Severe breathlessness', 'Blue or gray lips', 'Rescue inhaler not helping'];

@@ -3,10 +3,12 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
   DEFAULT_COMPANION_NAME,
+  STREAK_CARD_DAYS,
   XP_PER_CHECK_IN,
   XP_PER_FEEDBACK,
   XP_PER_LEVEL,
   XP_PER_STREAK_DAY,
+  XP_STREAK_CARD_BONUS,
 } from '../config';
 import demoLog from '../mocks/log.json';
 import { DEMO_USER_ID } from '../survey';
@@ -99,6 +101,11 @@ function loadState() {
   return { profile: EMPTY_PROFILE, game: EMPTY_GAME };
 }
 
+// The streak still counts only if the last check-in was today or yesterday.
+export function currentStreak(game) {
+  return game.lastCheckInDate === todayString() || game.lastCheckInDate === todayString(-1) ? game.streak : 0;
+}
+
 export function levelInfo(xp) {
   return {
     level: Math.floor(xp / XP_PER_LEVEL) + 1,
@@ -133,14 +140,19 @@ export function GameProvider({ children }) {
 
   const reset = useCallback(() => setState({ profile: EMPTY_PROFILE, game: EMPTY_GAME }), []);
 
-  // Records today's check-in and returns what to celebrate.
+  // Records today's check-in and returns what to celebrate. The streak counts days with at
+  // least one check-in, so checking in again the same day only updates the entry: no XP.
   const recordCheckIn = useCallback(
     (entry) => {
       const today = todayString();
       const game = state.game;
-      if (game.lastCheckInDate === today) return null;
+      if (game.lastCheckInDate === today) {
+        setState((previous) => ({ ...previous, game: { ...previous.game, todayEntry: entry } }));
+        return { updated: true, streak: game.streak };
+      }
       const streak = game.lastCheckInDate === todayString(-1) ? game.streak + 1 : 1;
-      const xpGained = XP_PER_CHECK_IN + XP_PER_STREAK_DAY * streak;
+      const cardFilled = streak % STREAK_CARD_DAYS === 0;
+      const xpGained = XP_PER_CHECK_IN + XP_PER_STREAK_DAY * streak + (cardFilled ? XP_STREAK_CARD_BONUS : 0);
       const next = {
         ...game,
         xp: game.xp + xpGained,
@@ -155,6 +167,9 @@ export function GameProvider({ children }) {
       return {
         xpGained,
         streak,
+        cardFilled,
+        xpBefore: game.xp,
+        xpAfter: next.xp,
         leveledUp: levelInfo(next.xp).level > levelInfo(game.xp).level,
         newBadges: BADGES.filter((badge) => badge.earned(next) && !before.includes(badge.id)),
       };

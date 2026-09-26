@@ -34,8 +34,10 @@ Reads take `?user=<id>` (the demo user is `demo`). The mock files in `src/mocks/
 | GET | `/environment` | `environment.json`: `current` conditions plus map `zones` |
 | GET | `/log` | `log.json`: history, streak, rolling accuracy |
 | GET | `/summary` | `summary.json`: weekly Gemini summary |
-| POST | `/log` | Today's check-in: `{ user, date, puffs, pre_exercise_puffs, symptoms: {breath, wheeze, cough}, night_waking, emergency_signs }` |
+| POST | `/log` | Today's check-in: `{ user, date, puffs, pre_exercise_puffs, symptoms: {breath, wheeze, cough}, night_waking, emergency_signs }`. `puffs` is the day's total and includes `pre_exercise_puffs`. Saving the same user and date again should update that day, not add a new one. |
 | POST | `/feedback` | `{ user, date, predicted_risk, had_flare_up }` |
 | POST | `/profile` | `{ user, companion_name, survey, baseline_estimate }` |
 
 The backend needs CORS enabled for `http://localhost:5173`.
+
+The frontend only shows a save as successful when the POST returns a 2xx response. Requests time out after 8 seconds.

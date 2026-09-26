@@ -11,17 +11,26 @@ import summary from './mocks/summary.json';
 
 const MOCKS = { risk, triggers, environment, log, summary };
 const MOCK_DELAY_MS = 250;
+// Give up on a slow backend instead of leaving a screen waiting forever.
+const REQUEST_TIMEOUT_MS = 8000;
 
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const copy = (value) => JSON.parse(JSON.stringify(value));
 
 async function request(path, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
-    ...options,
-  });
-  if (!response.ok) throw new Error(`${path} returned ${response.status}`);
-  return response.json();
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const response = await fetch(`${API_BASE_URL}${path}`, {
+      headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
+      ...options,
+    });
+    if (!response.ok) throw new Error(`${path} returned ${response.status}`);
+    return await response.json();
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 async function read(name, user) {
@@ -37,13 +46,16 @@ async function read(name, user) {
   }
 }
 
+// Returns { ok: true, mock, data } when saved, or { ok: false, error } so screens only
+// report success after a save actually worked. Mock saves live in this browser only.
 async function send(name, body) {
   if (USE_MOCK) {
     await wait(MOCK_DELAY_MS);
-    return { ok: true, mock: true };
+    return { ok: true, mock: true, data: null };
   }
   try {
-    return await request(`/${name}`, { method: 'POST', body: JSON.stringify(body) });
+    const data = await request(`/${name}`, { method: 'POST', body: JSON.stringify(body) });
+    return { ok: true, mock: false, data };
   } catch (error) {
     console.warn(`[api] POST /${name} failed`, error);
     return { ok: false, error: error.message };
@@ -58,7 +70,8 @@ export const getLog = (user = 'demo') => read('log', user);
 export const getSummary = (user = 'demo') => read('summary', user);
 
 // Writes.
-// entry: { user, date, puffs, pre_exercise_puffs, symptoms: {breath, wheeze, cough}, night_waking, emergency_signs: [] }
+// entry: { user, date, puffs (total, including pre-exercise), pre_exercise_puffs, symptoms: {breath, wheeze, cough},
+//          night_waking, emergency_signs: [] }. Saving the same user and date again updates that day.
 export const submitCheckIn = (entry) => send('log', entry);
 // feedback: { user, date, predicted_risk, had_flare_up }
 export const submitFeedback = (feedback) => send('feedback', feedback);

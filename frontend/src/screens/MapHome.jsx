@@ -15,7 +15,7 @@ import NearbyPanel from '../components/NearbyPanel';
 import TrainerBadge from '../components/TrainerBadge';
 import { RISK_LEVELS, USE_MOCK, levelFromScore } from '../config';
 import { distanceKm } from '../geo';
-import { todayString, useGame } from '../state/GameContext';
+import { currentStreak, todayString, useGame } from '../state/GameContext';
 
 const DEFAULT_CENTER = { lat: 29.6516, lon: -82.3248 };
 const DEFAULT_ZOOM = 15;
@@ -131,7 +131,7 @@ export default function MapHome() {
         </div>
         <div className="hud-top-right">
           <span className="streak-chip" title="Check-in streak">
-            🔥 {game.streak}
+            🔥 {currentStreak(game)}
           </span>
           {USE_MOCK && <span className="mock-flag">Mock data</span>}
         </div>

@@ -754,3 +754,144 @@ code {
 .onboarding-actions .pill-button { width: 80%; }
 .onboarding-actions .text-button { color: #fff; }
 .onboarding .speech-card .muted { color: var(--ink-soft); font-size: 0.85rem; }
+
+/* ---------- Daily quest (Task 5) ---------- */
+.quest { display: grid; gap: 14px; }
+.quest-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.quest-card h2 { font-size: 1.1rem; }
+.quest-xp { background: var(--sun-soft); color: #8a5300; font-weight: 900; font-size: 0.85rem; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+.objectives { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 8px; }
+.objectives li { display: flex; align-items: center; gap: 10px; color: var(--ink-soft); font-size: 0.95rem; }
+.objectives li.current { color: var(--ink); font-weight: 700; }
+.objectives li.done { color: var(--teal); }
+.objective-mark {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  display: grid;
+  place-items: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex: none;
+}
+.objectives li.current .objective-mark { border-color: var(--teal); color: var(--teal); }
+.objectives li.done .objective-mark { background: var(--teal); border-color: var(--teal); color: #fff; }
+.quest-progress { height: 6px; border-radius: 999px; background: var(--bg); margin-top: 12px; overflow: hidden; }
+.quest-progress span { display: block; height: 100%; background: var(--grad-button); transition: width 0.3s ease; }
+.quest-card.done h2 { color: var(--teal); margin: 4px 0; }
+
+.quest-step { display: grid; gap: 14px; }
+.quest-step h3 { font-size: 1.05rem; line-height: 1.35; }
+.stepper { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.stepper-label { font-weight: 700; }
+.stepper-controls { display: flex; align-items: center; gap: 12px; }
+.stepper-controls .round-button { background: var(--bg); box-shadow: none; font-size: 1.4rem; font-weight: 700; }
+.stepper-controls output { min-width: 32px; text-align: center; font-size: 1.6rem; font-weight: 900; }
+
+.symptom-row { display: grid; gap: 6px; }
+.symptom-label { font-weight: 700; font-size: 0.95rem; }
+.segments { display: grid; grid-template-columns: repeat(4, 1fr); background: var(--bg); border-radius: 999px; padding: 3px; }
+.segment {
+  min-height: 38px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+.segment.selected { background: var(--teal); color: #fff; }
+.segment:focus-visible { outline: 3px solid var(--teal); outline-offset: 1px; }
+.quest-step .option { background: var(--bg); }
+.quest-step .option.selected { background: #e4f7ee; border-color: var(--teal); box-shadow: none; }
+.option.compact { min-height: 46px; }
+
+.quest-actions { display: grid; justify-items: center; gap: 2px; }
+.quest-actions .pill-button { width: 80%; }
+.quest-actions .text-button { color: #fff; }
+
+.streak-card-head { display: flex; justify-content: space-between; align-items: baseline; }
+.stamps { list-style: none; margin: 10px 0; padding: 0; display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.stamp {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px dashed var(--line);
+  display: grid;
+  place-items: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.stamp.done { border: 0; background: var(--sun); color: #fff; font-size: 1rem; }
+.stamp.bonus:not(.done) { border-color: var(--sun); }
+.stamp.today { border: 2px solid var(--teal); color: var(--teal); animation: stamp-glow 1.4s ease-in-out infinite; }
+.stamp.pop { animation: stamp-pop 0.6s cubic-bezier(0.2, 1.6, 0.4, 1) 0.4s both; }
+@keyframes stamp-glow { 0%, 100% { box-shadow: 0 0 0 0 rgba(74, 168, 154, 0.5); } 50% { box-shadow: 0 0 0 6px rgba(74, 168, 154, 0); } }
+@keyframes stamp-pop { from { transform: scale(0); } to { transform: scale(1); } }
+
+.quest-reward { display: grid; gap: 12px; justify-items: center; text-align: center; }
+.quest-reward > .card { width: 100%; text-align: left; }
+.reward-burst {
+  margin-top: 10px;
+  padding: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.45), transparent 70%);
+  animation: reward-in 0.5s ease both;
+}
+.reward-xp { font-size: 2.6rem; font-weight: 900; color: #fff; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.25); }
+.reward-banner { background: rgba(255, 255, 255, 0.92); color: var(--ink); font-weight: 700; padding: 8px 16px; border-radius: 999px; animation: reward-in 0.5s ease 0.3s both; }
+.pill-button.as-link { display: inline-grid; place-items: center; text-decoration: none; width: 80%; }
+@keyframes reward-in { from { transform: scale(0.6); opacity: 0; } }
+
+/* ---------- Emergency (plain on purpose) ---------- */
+.emergency {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  background: #fff;
+  color: #1a1a1a;
+  padding: 32px 22px;
+  display: grid;
+  gap: 16px;
+  align-content: start;
+  font-size: 1.1rem;
+}
+.emergency .urgent { border: 0; padding: 0; background: none; }
+.emergency .urgent h2 { font-size: 1.8rem; }
+.emergency-note { font-size: 0.95rem; color: #444; }
+.emergency-back { color: #1a1a1a; font-size: 1rem; }
+
+/* Urgent notice: high contrast, no game styling, words as well as color. */
+.urgent {
+  background: #fff;
+  color: #1a1a1a;
+  border: 3px solid #b3261e;
+  border-radius: 12px;
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+}
+.urgent h2 { color: #b3261e; font-size: 1.3rem; font-weight: 900; }
+.urgent ul { margin: 0; padding-left: 22px; display: grid; gap: 6px; font-weight: 700; }
+.urgent-call {
+  display: grid;
+  place-items: center;
+  min-height: 56px;
+  border-radius: 12px;
+  background: #b3261e;
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+/* Check-in validation and save feedback. */
+.stepper-block { display: grid; gap: 4px; }
+.field-error { color: #b3261e; font-size: 0.88rem; font-weight: 700; }
+.field-error::before { content: '⚠ '; }
+.save-error { background: #fff; color: #b3261e; border-radius: 12px; padding: 10px 14px; font-weight: 700; text-align: center; }
+.save-note { background: rgba(255, 255, 255, 0.92); color: var(--ink); font-size: 0.85rem; font-weight: 700; padding: 4px 12px; border-radius: 999px; }
+.quest-card .save-note { background: var(--bg); justify-self: start; }

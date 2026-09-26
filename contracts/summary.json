@@ -1,0 +1,11 @@
+{
+  "user_id": "demo-user-1",
+  "title": "Weekly environmental summary",
+  "period_start": "2026-09-20",
+  "period_end": "2026-09-26",
+  "data_mode": "mock",
+  "model_status": "not_connected",
+  "summary": "This example shows how your weekly summary will look. Once connected, it will summarize your recorded check-ins and the model's weather, pollen, and air-quality patterns.",
+  "days_logged": 0,
+  "disclaimer": "This is placeholder text. No health history has been analyzed, and Gemini is not connected yet."
+}

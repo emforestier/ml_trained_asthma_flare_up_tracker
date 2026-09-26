@@ -1,0 +1,29 @@
+	
+
+{
+  "user_id": "demo-user-1",
+  "title": "Environmental patterns",
+  "data_mode": "mock",
+  "model_status": "not_connected",
+  "patterns": [
+    {
+      "factor": "pollen",
+      "label": "Pollen",
+      "strength": "strong",
+      "description": "Placeholder: pollen has a strong influence in this example."
+    },
+    {
+      "factor": "weather",
+      "label": "Weather",
+      "strength": "moderate",
+      "description": "Placeholder: weather has a moderate influence in this example."
+    },
+    {
+      "factor": "air_quality",
+      "label": "Air quality",
+      "strength": "weak",
+      "description": "Placeholder: air quality has a weak influence in this example."
+    }
+  ],
+  "disclaimer": "These are sample patterns for testing the interface. They are not learned from a person's health history and do not establish medical causes."
+}

@@ -1,0 +1,27 @@
+{
+  "user_id": "demo-user-1",
+  "prediction_for": "2026-09-27",
+  "risk_score": 0.62,
+  "risk_level": "elevated",
+  "top_factors": [
+    {
+      "name": "Pollen",
+      "direction": "increases",
+      "strength": "strong"
+    },
+    {
+      "name": "Weather",
+      "direction": "increases",
+      "strength": "moderate"
+    },
+    {
+      "name": "Air quality",
+      "direction": "increases",
+      "strength": "weak"
+    }
+  ],
+  "recommendation": "Review your existing asthma action plan.",
+  "data_mode": "mock",
+  "model_status": "not_connected",
+  "disclaimer": "This is a fixed sample prediction for testing the interface. It is not a medical assessment."
+}

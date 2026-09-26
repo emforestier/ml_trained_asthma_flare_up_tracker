@@ -3,9 +3,9 @@
 import { Link } from 'react-router-dom';
 
 const ITEMS = [
-  { to: '/forecast', icon: '🌤️', label: 'Forecast' },
+  { to: '/forecast', icon: '🌤️', label: 'Demo score' },
   { to: '/check-in', icon: '⭐', label: 'Check-in' },
-  { to: '/triggers', icon: '🔍', label: 'Triggers' },
+  { to: '/triggers', icon: '🔍', label: 'Patterns' },
   { to: '/profile', icon: '👤', label: 'Profile' },
 ];
 

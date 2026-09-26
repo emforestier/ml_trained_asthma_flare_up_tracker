@@ -3,7 +3,7 @@
 // moment an emergency sign is selected, without finishing the quest or waiting on the backend.
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { submitCheckIn } from '../api';
+import { saveLog } from '../api';
 import Companion from '../components/Companion';
 import StreakCard from '../components/StreakCard';
 import UrgentNotice from '../components/UrgentNotice';
@@ -209,7 +209,7 @@ export default function CheckIn() {
     if (Object.keys(errors).length > 0) return;
     setSaving(true);
     setSaveError(null);
-    const saved = await submitCheckIn(entry);
+    const saved = await saveLog(entry);
     setSaving(false);
     if (!saved.ok) {
       setSaveError("Couldn't save your check-in. Check your connection and try again.");

@@ -895,3 +895,33 @@ code {
 .save-error { background: #fff; color: #b3261e; border-radius: 12px; padding: 10px 14px; font-weight: 700; text-align: center; }
 .save-note { background: rgba(255, 255, 255, 0.92); color: var(--ink); font-size: 0.85rem; font-weight: 700; padding: 4px 12px; border-radius: 999px; }
 .quest-card .save-note { background: var(--bg); justify-self: start; }
+
+/* ---------- Honest labels (build guide) ---------- */
+.synthetic-tag {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--lav-soft);
+  color: #5b4bb0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  vertical-align: middle;
+}
+.overlay-tag { font-size: 0.72rem; font-weight: 700; color: var(--ink-soft); }
+.overlay-tag.on-map { background: rgba(255, 255, 255, 0.85); padding: 3px 10px; border-radius: 999px; color: var(--ink); }
+.model-note { font-size: 0.8rem; color: var(--ink-soft); text-align: center; margin-top: -6px; }
+.stale-note { font-size: 0.82rem; font-weight: 700; color: #8a5300; background: var(--sun-soft); padding: 4px 10px; border-radius: 8px; margin: 6px 0; }
+.emergency-button { border: 2px solid #b3261e; }
+
+.factor-effect { font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
+.factor-effect.up { color: #a3302a; }
+.factor-effect.down { color: #1f6e56; }
+.factor-value { font-size: 0.8rem; }
+.factor-bar span.up { background: var(--coral); }
+.factor-bar span.down { background: var(--mint); }
+
+.conditions .condition-rows { list-style: none; margin: 10px 0; padding: 0; display: grid; gap: 8px; }
+.conditions .condition-rows li { display: grid; grid-template-columns: 24px 1fr auto; gap: 8px; align-items: center; font-size: 0.92rem; }
+.conditions-source { font-size: 0.78rem; }

@@ -2,6 +2,7 @@
 // The backend owns the health data; this only holds what the game layer needs.
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import {
+  CITY_TIME_ZONE,
   DEFAULT_COMPANION_NAME,
   STREAK_CARD_DAYS,
   XP_PER_CHECK_IN,
@@ -24,12 +25,10 @@ export const BADGES = [
   { id: 'explorer', icon: '🗺️', name: 'Air explorer', description: 'Open the air map', earned: (g) => g.visitedMap },
 ];
 
+// Local date (YYYY-MM-DD) in the team's city time zone, offset by whole days.
 export function todayString(offsetDays = 0) {
-  const date = new Date();
-  date.setDate(date.getDate() + offsetDays);
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${date.getFullYear()}-${month}-${day}`;
+  const date = new Date(Date.now() + offsetDays * 24 * 60 * 60 * 1000);
+  return date.toLocaleDateString('en-CA', { timeZone: CITY_TIME_ZONE });
 }
 
 const EMPTY_GAME = {
@@ -62,7 +61,7 @@ function demoGame() {
 const DEMO_PROFILE = {
   onboarded: true,
   isDemo: true,
-  user: 'demo',
+  user: DEMO_USER_ID,
   nickname: 'Sam',
   city: 'Gainesville, FL',
   companionName: DEFAULT_COMPANION_NAME,

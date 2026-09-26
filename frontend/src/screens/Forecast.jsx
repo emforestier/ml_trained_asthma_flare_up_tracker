@@ -1,19 +1,17 @@
-// Tomorrow's forecast as an encounter-style scene: the companion in a little world with a
-// name tag showing the risk, and the details in a sheet underneath.
+// Tomorrow's experimental demo score as an encounter-style scene: the companion in a little
+// world with a name tag showing the score, and the details in a sheet underneath.
 import { Link } from 'react-router-dom';
 import { getEnvironment, getRisk, useApi } from '../api';
 import Companion from '../components/Companion';
 import ConditionChip from '../components/ConditionChip';
+import ConditionsCard from '../components/ConditionsCard';
 import FactorList from '../components/FactorList';
 import RiskRing from '../components/RiskRing';
-import { BASELINE_WINDOW_DAYS, DISCLAIMER, RISK_LEVELS, levelFromScore } from '../config';
+import { BASELINE_WINDOW_DAYS, DISCLAIMER, MODEL_NOTE, MOOD_LINES, RISK_LEVELS, SCORE_NAME, levelFromScore } from '../config';
 import { useGame } from '../state/GameContext';
 
-const MOOD_LINES = {
-  low: 'Clear skies ahead. Tomorrow looks calm!',
-  moderate: "There's a bit in the air tomorrow. Let's keep an eye out.",
-  high: "Tomorrow could be rough. Let's get ready together.",
-};
+// The contract sends the suggestion as text; older mocks sent { text }.
+const recommendationText = (recommendation) => (typeof recommendation === 'string' ? recommendation : recommendation?.text);
 
 export default function Forecast() {
   const { profile, game } = useGame();
@@ -32,11 +30,12 @@ export default function Forecast() {
     );
   }
 
-  const { risk_score: score, top_factors: factors, recommendation, explanation, learning } = risk.data;
-  const level = risk.data.risk_level || levelFromScore(score);
+  const { risk_score: score, top_factors: factors = [], explanation } = risk.data;
+  const level = RISK_LEVELS[risk.data.risk_level] ? risk.data.risk_level : levelFromScore(score);
   const { label, mood } = RISK_LEVELS[level];
-  const daysLogged = profile.isDemo ? learning?.days_logged ?? game.checkIns : game.checkIns;
+  const daysLogged = profile.isDemo ? risk.data.days_logged ?? game.checkIns : game.checkIns;
   const { correct, total } = game.accuracy;
+  const suggestion = recommendationText(risk.data.recommendation);
 
   return (
     <div className="forecast">
@@ -47,7 +46,7 @@ export default function Forecast() {
         <div className="glass-pill">
           <span>{profile.companionName}</span>
           <span className="divider">/</span>
-          <small>RISK</small>
+          <small>DEMO SCORE</small>
           <strong>{Math.round(score * 100)}%</strong>
         </div>
         <div className="scene-companion">
@@ -62,11 +61,12 @@ export default function Forecast() {
         <section className="card risk-summary">
           <RiskRing score={score} level={level} />
           <div style={{ display: 'grid', gap: 6 }}>
-            <p className="eyebrow">Tomorrow's flare-up risk</p>
-            <h2>{label} risk</h2>
+            <p className="eyebrow">{SCORE_NAME} for tomorrow</p>
+            <h2>{label}</h2>
             {environment.data && <ConditionChip current={environment.data.current} />}
           </div>
         </section>
+        <p className="model-note">{MODEL_NOTE}</p>
 
         {daysLogged < BASELINE_WINDOW_DAYS && (
           <p className="learning-banner">
@@ -74,20 +74,25 @@ export default function Forecast() {
           </p>
         )}
 
-        <section className="card">
-          <p className="eyebrow">Today's tip</p>
-          <p className="tip-text">{recommendation.text}</p>
-        </section>
+        {suggestion && (
+          <section className="card">
+            <p className="eyebrow">Suggestion</p>
+            <p className="tip-text">{suggestion}</p>
+          </section>
+        )}
 
         <section className="card">
-          <p className="eyebrow">Why {profile.companionName} thinks so</p>
+          <p className="eyebrow">What the demo model weighed most</p>
           <FactorList factors={factors} />
           {explanation && <p className="explanation">{explanation}</p>}
         </section>
 
+        {environment.data && <ConditionsCard environment={environment.data} />}
+
         {total > 0 && (
           <p className="accuracy" style={{ textAlign: 'center' }}>
-            🎯 {profile.companionName} has been right <strong>{correct} of {total}</strong> times ({Math.round((correct / total) * 100)}%)
+            🎯 <strong>{correct}</strong> matching {correct === 1 ? 'outcome' : 'outcomes'} out of <strong>{total}</strong> answered{' '}
+            {total === 1 ? 'day' : 'days'}
           </p>
         )}
         <p className="disclaimer">{DISCLAIMER}</p>

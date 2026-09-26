@@ -4,12 +4,25 @@
 export const USE_MOCK = import.meta.env.VITE_USE_MOCK !== 'false';
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
-// Risk levels, matching risk_level in risk.json.
+// Levels for the experimental demo score, matching risk_level in risk.json. Every level has a
+// word as well as a color. "elevated" is the contract's name for the middle level.
 export const RISK_LEVELS = {
   low: { label: 'Low', color: 'var(--mint)', mood: 'happy' },
   moderate: { label: 'Moderate', color: 'var(--sun)', mood: 'uneasy' },
+  elevated: { label: 'Elevated', color: 'var(--sun)', mood: 'uneasy' },
   high: { label: 'High', color: 'var(--coral)', mood: 'worried' },
 };
+
+// What the companion says for each level. A low score never promises a safe day.
+export const MOOD_LINES = {
+  low: 'Lower score for tomorrow. Keep your action plan handy anyway.',
+  moderate: "Some things in the air tomorrow. Let's keep an eye out.",
+  elevated: "Some things in the air tomorrow. Let's keep an eye out.",
+  high: "Higher score for tomorrow. Let's get ready together.",
+};
+
+export const SCORE_NAME = 'Experimental demo score';
+export const MODEL_NOTE = 'Demo model trained on simulated patient data. Not a medical prediction or diagnosis.';
 
 // Used only if the backend sends a score without a level.
 export function levelFromScore(score) {
@@ -29,6 +42,8 @@ export const XP_PER_LEVEL = 200;
 
 export const DEFAULT_COMPANION_NAME = 'Breezy';
 export const DEFAULT_CITY = 'Gainesville, FL';
+// Everyone uses the city's time zone so one person's Saturday is everyone's Saturday.
+export const CITY_TIME_ZONE = 'America/New_York';
 
 export const DISCLAIMER = "This app helps you track risk and doesn't replace advice from your doctor.";
 

@@ -10,7 +10,7 @@ export function worstCondition(current) {
   const candidates = [
     {
       icon: '🌳',
-      text: `${type[0].toUpperCase()}${type.slice(1)} pollen`,
+      text: `Synthetic ${type} pollen`,
       level: pollen >= A.pollenHigh ? 'high' : pollen >= A.pollenModerate ? 'moderate' : 'low',
     },
     {

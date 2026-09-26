@@ -1,4 +1,4 @@
-// Circular gauge for tomorrow's flare-up risk, colored by risk level.
+// Circular gauge for tomorrow's experimental demo score, colored and labeled by level.
 import { RISK_LEVELS } from '../config';
 
 const RADIUS = 44;
@@ -8,7 +8,7 @@ export default function RiskRing({ score, level }) {
   const percent = Math.round(score * 100);
   const { label, color } = RISK_LEVELS[level];
   return (
-    <div className="risk-ring" role="img" aria-label={`${percent}% risk of a flare-up tomorrow, ${label.toLowerCase()}`}>
+    <div className="risk-ring" role="img" aria-label={`Experimental demo score for tomorrow: ${percent}%, ${label.toLowerCase()}`}>
       <svg width="112" height="112" viewBox="0 0 112 112" aria-hidden="true">
         <circle cx="56" cy="56" r={RADIUS} fill="none" stroke="var(--line)" strokeWidth="10" />
         <circle

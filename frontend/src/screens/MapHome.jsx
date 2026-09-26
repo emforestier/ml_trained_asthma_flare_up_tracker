@@ -119,15 +119,16 @@ export default function MapHome() {
       <div className="hud-top">
         <div className="hud-top-left">
           {risk.data && (
-            <Link to="/forecast" className="glass-pill risk-pill">
+            <Link to="/forecast" className="glass-pill risk-pill" aria-label={`Experimental demo score for tomorrow: ${Math.round(risk.data.risk_score * 100)}%, ${RISK_LEVELS[level].label}`}>
               <span className="risk-dot" style={{ background: RISK_LEVELS[level].color }} />
-              <small>TOMORROW</small>
+              <small>DEMO SCORE</small>
               <span className="divider">/</span>
               <strong>{Math.round(risk.data.risk_score * 100)}%</strong>
               <small>{RISK_LEVELS[level].label.toUpperCase()}</small>
             </Link>
           )}
           {environment.data && <ConditionChip current={environment.data.current} />}
+          {zones.length > 0 && <span className="overlay-tag on-map">Illustrative demo overlay</span>}
         </div>
         <div className="hud-top-right">
           <span className="streak-chip" title="Check-in streak">
@@ -138,6 +139,9 @@ export default function MapHome() {
       </div>
 
       <div className="hud-right">
+        <Link to="/emergency" className="round-button emergency-button" aria-label="Emergency help">
+          🚨
+        </Link>
         <button className="round-button" onClick={() => flyTo(user.lat, user.lon, DEFAULT_ZOOM)} aria-label="Back to my location">
           🧭
         </button>

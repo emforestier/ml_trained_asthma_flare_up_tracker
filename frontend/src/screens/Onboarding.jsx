@@ -20,6 +20,7 @@ export default function Onboarding() {
   const [answers, setAnswers] = useState(EMPTY_ANSWERS);
   const [step, setStep] = useState('intro'); // 'intro', a question index, or 'done'
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
 
   const visible = QUESTIONS.filter((question) => !question.skipWhen?.(answers));
   const index = typeof step === 'number' ? step : -1;
@@ -45,7 +46,8 @@ export default function Onboarding() {
       baselineEstimate: baselineEstimate(survey),
       isDemo: false,
     };
-    await saveProfile({
+    setSaveError(null);
+    const saved = await saveProfile({
       user: profile.user,
       nickname: profile.nickname,
       city: profile.city,
@@ -53,6 +55,11 @@ export default function Onboarding() {
       survey,
       baseline_estimate: profile.baselineEstimate,
     });
+    setSaving(false);
+    if (!saved.ok) {
+      setSaveError("Couldn't save your profile. Check your connection and try again.");
+      return;
+    }
     finishOnboarding(profile);
   }
 
@@ -92,9 +99,14 @@ export default function Onboarding() {
           </p>
           <p className="muted">{DISCLAIMER}</p>
         </div>
+        {saveError && (
+          <p className="save-error" role="alert">
+            {saveError}
+          </p>
+        )}
         <div className="onboarding-actions">
           <button className="pill-button" onClick={finish} disabled={saving}>
-            Start
+            {saving ? 'Saving…' : saveError ? 'Try again' : 'Start'}
           </button>
           <button className="text-button" onClick={() => setStep(visible.length - 1)} disabled={saving}>
             Back

@@ -27,7 +27,7 @@ function Screens() {
       <Route path="forecast" element={<Forecast />} />
       <Route element={<AppLayout />}>
         <Route path="check-in" element={<CheckIn />} />
-        <Route path="triggers" element={<Placeholder title="Triggers" milestone="Sat 6 PM" loader={getTriggers} endpoint="triggers" />} />
+        <Route path="triggers" element={<Placeholder title="Patterns" milestone="Sat 6 PM" loader={getTriggers} endpoint="triggers" />} />
         <Route path="profile" element={<Placeholder title="Profile" milestone="Sat 8 PM" loader={getLog} endpoint="log" />} />
       </Route>
       <Route path="emergency" element={<Emergency />} />

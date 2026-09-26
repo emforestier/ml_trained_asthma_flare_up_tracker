@@ -3,6 +3,7 @@
 // to the mocks if a request fails, so the demo keeps working if the backend goes down.
 import { useCallback, useEffect, useState } from 'react';
 import { API_BASE_URL, USE_MOCK } from './config';
+import { DEMO_USER_ID } from './survey';
 import risk from './mocks/risk.json';
 import triggers from './mocks/triggers.json';
 import environment from './mocks/environment.json';
@@ -63,18 +64,18 @@ async function send(name, body) {
 }
 
 // Reads (one per contract file).
-export const getRisk = (user = 'demo') => read('risk', user);
-export const getTriggers = (user = 'demo') => read('triggers', user);
-export const getEnvironment = (user = 'demo') => read('environment', user);
-export const getLog = (user = 'demo') => read('log', user);
-export const getSummary = (user = 'demo') => read('summary', user);
+export const getRisk = (user = DEMO_USER_ID) => read('risk', user);
+export const getTriggers = (user = DEMO_USER_ID) => read('triggers', user);
+export const getEnvironment = (user = DEMO_USER_ID) => read('environment', user);
+export const getLog = (user = DEMO_USER_ID) => read('log', user);
+export const getSummary = (user = DEMO_USER_ID) => read('summary', user);
 
 // Writes.
 // entry: { user, date, puffs (total, including pre-exercise), pre_exercise_puffs, symptoms: {breath, wheeze, cough},
 //          night_waking, emergency_signs: [] }. Saving the same user and date again updates that day.
-export const submitCheckIn = (entry) => send('log', entry);
+export const saveLog = (entry) => send('log', entry);
 // feedback: { user, date, predicted_risk, had_flare_up }
-export const submitFeedback = (feedback) => send('feedback', feedback);
+export const saveFeedback = (feedback) => send('feedback', feedback);
 // profile: { user, companion_name, survey, baseline_estimate }
 export const saveProfile = (profile) => send('profile', profile);
 

@@ -2,7 +2,8 @@
 
 // Mock switch: set VITE_USE_MOCK=false in .env to call the real backend.
 export const USE_MOCK = import.meta.env.VITE_USE_MOCK !== 'false';
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+// Requests go to /api, which the Vite dev and preview servers forward to the backend (see vite.config.js).
+export const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 // Levels for the experimental demo score, matching risk_level in risk.json. Every level has a
 // word as well as a color. "elevated" is the contract's name for the middle level.

@@ -19,9 +19,17 @@ All data goes through `src/api.js`. Screens never call `fetch` themselves.
 | `.env` setting | What happens |
 |---|---|
 | `VITE_USE_MOCK=true` (default) | Reads the JSON files in `src/mocks/`. A purple "Mock data" tag shows in the corner. |
-| `VITE_USE_MOCK=false` | Calls the FastAPI backend at `VITE_API_URL`. If a request fails, that screen falls back to the mock file so the demo keeps working. |
+| `VITE_USE_MOCK=false` | Calls the FastAPI backend through `/api` (see below). If a request fails, that screen falls back to the mock file so the demo keeps working. |
 
 Copy `.env.example` to `.env` to change these. Restart `npm run dev` after editing `.env`.
+
+### Connecting to the backend
+
+The app sends requests to `/api/...`, and the Vite dev server (`npm run dev`) and `npm run preview` forward them to the backend at `BACKEND_URL` (default `http://localhost:8000`). The browser only talks to one address, so the backend does not need CORS settings for local development or the demo laptop.
+
+1. Start Junia's backend on port 8000.
+2. In `frontend/.env`, set `VITE_USE_MOCK=false`.
+3. Restart `npm run dev`.
 
 ## Endpoints the frontend calls
 
@@ -39,8 +47,6 @@ Reads take `?user=<id>` (the fictional demo user is `demo-user-1`). The mock fil
 | POST | `/profile` | `{ user, nickname, city, companion_name, survey, baseline_estimate }` |
 
 `/environment` can also use the backend's nested format (`weather`, `air_quality`, `pollen` objects, as in `contracts/environment.json` on the Backend branch). `normalizeEnvironment` in `src/api.js` converts it; fields not sent yet, such as `aqi` or `pressure_change_24h`, show as "Not available". Map zones stay a frontend illustrative overlay until the backend sends `zones`.
-
-The backend needs CORS enabled for `http://localhost:5173`.
 
 The frontend only shows a save as successful when the POST returns a 2xx response. Requests time out after 8 seconds.
 

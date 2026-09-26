@@ -1,6 +1,7 @@
 // Menu opened by the big round button: a drawer that slides up over the map
 // instead of covering the whole screen.
 import { Link } from 'react-router-dom';
+import Wordmark from './Wordmark';
 
 const ITEMS = [
   { to: '/forecast', icon: '🌤️', label: 'Demo score' },
@@ -14,6 +15,7 @@ export default function MainMenu({ onClose }) {
     <>
       <div className="scrim" onClick={onClose} />
       <nav className="menu-drawer" aria-label="Main menu">
+        <Wordmark size="small" tone="dark" />
         <div className="menu-grid">
           {ITEMS.map(({ to, icon, label }) => (
             <Link key={to} to={to} className="menu-item">

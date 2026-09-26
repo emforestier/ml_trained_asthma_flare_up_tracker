@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { saveProfile } from '../api';
 import Companion from '../components/Companion';
+import Wordmark from '../components/Wordmark';
 import { DEFAULT_COMPANION_NAME, DISCLAIMER } from '../config';
 import { useGame } from '../state/GameContext';
 import { DEMO_USER_ID, NO_RESCUE_DAYS, QUESTIONS, SURVEY_INTRO, ZERO_PUFFS, baselineEstimate, toggleTrigger } from '../survey';
@@ -81,6 +82,7 @@ export default function Onboarding({ mode = 'create' }) {
   if (step === 'intro') {
     return (
       <div className="onboarding">
+        <Wordmark tagline />
         <div className="onboarding-companion">
           <Companion mood="happy" size={170} />
         </div>

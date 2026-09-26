@@ -41,6 +41,10 @@ export const XP_PER_STREAK_DAY = 10;
 export const XP_PER_FEEDBACK = 15;
 export const XP_PER_LEVEL = 200;
 
+// The app's name and tagline, shown on the welcome screen and in the menu.
+export const APP_NAME = 'Breezy';
+export const APP_TAGLINE = 'Your asthma companion';
+
 export const DEFAULT_COMPANION_NAME = 'Breezy';
 export const DEFAULT_CITY = 'Gainesville, FL';
 // Everyone uses the city's time zone so one person's Saturday is everyone's Saturday.

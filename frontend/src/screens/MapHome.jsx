@@ -55,7 +55,9 @@ export default function MapHome() {
     [environment.data, user],
   );
 
-  const askFeedback = log.data?.last_prediction && feedbackOpen && !menuOpen && !selectedZone;
+  // Only ask about yesterday once the user has a yesterday in the app.
+  const hasHistory = profile.isDemo || game.checkIns > 0;
+  const askFeedback = hasHistory && log.data?.last_prediction && feedbackOpen && !menuOpen && !selectedZone;
 
   function mapReady(instance) {
     if (!instance || instance === map) return;

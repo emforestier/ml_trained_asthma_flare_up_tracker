@@ -9,8 +9,9 @@ import {
   XP_PER_STREAK_DAY,
 } from '../config';
 import demoLog from '../mocks/log.json';
+import { DEMO_USER_ID } from '../survey';
 
-const STORAGE_KEY = 'breezy-state-v1';
+const STORAGE_KEY = 'breezy-state-v2';
 
 export const BADGES = [
   { id: 'first', icon: '🌱', name: 'First breath', description: 'Finish your first check-in', earned: (g) => g.checkIns >= 1 },
@@ -60,20 +61,32 @@ const DEMO_PROFILE = {
   onboarded: true,
   isDemo: true,
   user: 'demo',
+  nickname: 'Sam',
+  city: 'Gainesville, FL',
   companionName: DEFAULT_COMPANION_NAME,
   survey: {
-    rescueDays: '1-2',
-    puffsPerDay: '2',
-    nightWaking: '1-2 a month',
-    controller: 'Yes',
-    triggers: ['Pollen', 'Smoke/pollution'],
-    preExercise: 'Yes',
+    nickname: 'Sam',
     city: 'Gainesville, FL',
+    rescueDays: '1–2 days',
+    puffsPerDay: '2 puffs',
+    nightWaking: 'Once or twice in the past four weeks',
+    controller: 'Yes',
+    triggers: ['Pollen', 'Smoke or air pollution'],
+    preExercise: 'Yes',
   },
-  baselineEstimate: 0.4,
+  baselineEstimate: 0.43,
 };
 
-const EMPTY_PROFILE = { onboarded: false, isDemo: false, user: 'new-user', companionName: DEFAULT_COMPANION_NAME, survey: {}, baselineEstimate: null };
+const EMPTY_PROFILE = {
+  onboarded: false,
+  isDemo: false,
+  user: DEMO_USER_ID,
+  nickname: '',
+  city: '',
+  companionName: DEFAULT_COMPANION_NAME,
+  survey: {},
+  baselineEstimate: null,
+};
 
 function loadState() {
   try {
@@ -82,8 +95,8 @@ function loadState() {
   } catch {
     // Storage blocked or corrupt: start fresh.
   }
-  // No saved state yet: open as the demo user.
-  return { profile: DEMO_PROFILE, game: demoGame() };
+  // No saved state yet: a first-time user, who starts with onboarding.
+  return { profile: EMPTY_PROFILE, game: EMPTY_GAME };
 }
 
 export function levelInfo(xp) {

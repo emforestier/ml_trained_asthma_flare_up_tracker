@@ -659,3 +659,98 @@ code {
 @keyframes smog-sway { 0%, 100% { transform: rotate(-4deg) translateY(0); } 50% { transform: rotate(4deg) translateY(-5px); } }
 @keyframes smoke-rise { 0% { opacity: 0; transform: translate(0, 6px) scale(0.6); } 30% { opacity: 0.9; } 100% { opacity: 0; transform: translate(0, -18px) scale(1.5); } }
 @keyframes swirl-fade { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+/* ---------- Onboarding: meet your companion ---------- */
+.onboarding {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  background: var(--grad-screen);
+  color: #fff;
+  padding: 28px 18px calc(28px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.onboarding-companion { display: grid; place-items: center; margin-top: 24px; }
+.onboarding-companion.small { margin-top: 0; }
+.onboarding-progress { height: 6px; border-radius: 999px; background: rgba(255, 255, 255, 0.3); overflow: hidden; flex: none; }
+.onboarding-progress span { display: block; height: 100%; background: #fff; border-radius: 999px; transition: width 0.3s ease; }
+
+/* The companion "talks" in a white card, like a game character's dialog box. */
+.speech-card {
+  background: #fff;
+  color: var(--ink);
+  border-radius: 14px;
+  padding: 16px 18px;
+  display: grid;
+  gap: 8px;
+  box-shadow: var(--shadow);
+  position: relative;
+}
+.speech-card::before {
+  content: '';
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  transform: translateX(-50%) rotate(45deg);
+  border-radius: 3px;
+}
+.speech-card > * { position: relative; }
+.speech-card .speaker { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--teal); }
+.speech-card h2 { font-size: 1.1rem; font-weight: 700; line-height: 1.35; }
+
+.option-list { display: grid; gap: 10px; }
+.option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 10px 16px;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.15s ease;
+}
+.option:active { transform: scale(0.98); }
+.option.selected { border-color: #fff; background: #e4f7ee; box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5); }
+.option:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.option-mark {
+  width: 26px;
+  height: 26px;
+  flex: none;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 0.9rem;
+}
+.option.selected .option-mark { background: var(--teal); border-color: var(--teal); }
+
+.text-input {
+  width: 100%;
+  min-height: 54px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 1.1rem;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.96);
+}
+.text-input:focus { outline: 3px solid #fff; outline-offset: 2px; }
+
+.why { font-size: 0.85rem; color: rgba(255, 255, 255, 0.9); background: rgba(0, 0, 0, 0.12); padding: 10px 14px; border-radius: 12px; }
+.onboarding-actions { display: grid; justify-items: center; gap: 4px; margin-top: auto; padding-top: 8px; }
+.onboarding-actions .pill-button { width: 80%; }
+.onboarding-actions .text-button { color: #fff; }
+.onboarding .speech-card .muted { color: var(--ink-soft); font-size: 0.85rem; }

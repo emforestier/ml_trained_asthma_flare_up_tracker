@@ -1,4 +1,4 @@
-// Bottom-left of the map: companion portrait, level, name and XP bar. Opens the profile.
+// Bottom-left of the map: companion portrait, level, the user's nickname and XP bar. Opens the profile.
 import { Link } from 'react-router-dom';
 import { levelInfo, useGame } from '../state/GameContext';
 import Companion from './Companion';
@@ -16,7 +16,7 @@ export default function TrainerBadge() {
         <span className="trainer-level">
           <small>Lv</small> {level}
         </span>
-        <span className="trainer-name">{profile.companionName}</span>
+        <span className="trainer-name">{profile.nickname || profile.companionName}</span>
         <span className="xp-bar">
           <span style={{ width: `${(progress / needed) * 100}%` }} />
         </span>

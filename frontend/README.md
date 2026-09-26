@@ -38,6 +38,8 @@ Reads take `?user=<id>` (the fictional demo user is `demo-user-1`). The mock fil
 | POST | `/feedback` | `{ user, date, predicted_risk, had_flare_up }` |
 | POST | `/profile` | `{ user, nickname, city, companion_name, survey, baseline_estimate }` |
 
+`/environment` can also use the backend's nested format (`weather`, `air_quality`, `pollen` objects, as in `contracts/environment.json` on the Backend branch). `normalizeEnvironment` in `src/api.js` converts it; fields not sent yet, such as `aqi` or `pressure_change_24h`, show as "Not available". Map zones stay a frontend illustrative overlay until the backend sends `zones`.
+
 The backend needs CORS enabled for `http://localhost:5173`.
 
 The frontend only shows a save as successful when the POST returns a 2xx response. Requests time out after 8 seconds.

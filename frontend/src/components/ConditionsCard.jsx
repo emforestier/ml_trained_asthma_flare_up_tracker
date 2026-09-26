@@ -11,7 +11,13 @@ function formatTime(iso) {
 const show = (value, suffix = '') => (value === null || value === undefined ? 'Not available' : `${value}${suffix}`);
 
 export default function ConditionsCard({ environment }) {
-  const { current, sources = {}, fetched_at: fetchedAt, is_stale: isStale, fromMock, city } = environment;
+  const { current, sources = {}, fetched_at: fetchedAt, valid_for: validFor, is_stale: isStale, fromMock, city } = environment;
+  // Prefer the exact fetch time; fall back to the day the data is for.
+  const when = fetchedAt
+    ? `Updated ${formatTime(fetchedAt)}`
+    : validFor
+      ? `For ${new Date(`${validFor}T12:00:00`).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' })}`
+      : 'Update time unknown';
   const pressure = current.pressure_change_24h;
   const rows = [
     ['🌡️', 'Temperature', show(current.temperature_c, '°C')],
@@ -45,7 +51,7 @@ export default function ConditionsCard({ environment }) {
         ))}
       </ul>
       <p className="muted conditions-source">
-        Updated {formatTime(fetchedAt)}. Weather: {sources.weather || 'unknown'}. Air quality: {sources.air_quality || 'unknown'}. Pollen:{' '}
+        {when}. Weather: {sources.weather || 'unknown'}. Air quality: {sources.air_quality || 'unknown'}. Pollen:{' '}
         {sources.pollen || 'synthetic demo data'}.
       </p>
     </section>

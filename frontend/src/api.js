@@ -34,13 +34,59 @@ async function request(path, options = {}) {
   }
 }
 
+// The backend's /environment nests weather, air_quality and pollen. The screens read one flat
+// `current` block, so convert here. Responses already in the flat shape pass through unchanged.
+// Anything the backend doesn't send yet becomes null ("Not available"), never a made-up zero.
+const valueOrNull = (value) => (value === undefined ? null : value);
+
+export function normalizeEnvironment(data) {
+  if (!data || data.current) return data;
+  const weather = data.weather || {};
+  const air = data.air_quality || {};
+  const pollen = data.pollen || {};
+  const { tree, grass, weed } = pollen;
+  return {
+    city: data.city,
+    lat: data.lat,
+    lon: data.lon,
+    fetched_at: data.fetched_at ?? null,
+    valid_for: data.valid_for ?? data.date ?? null,
+    // Sample data from the backend is labeled as not live.
+    is_stale: data.is_stale ?? data.data_mode !== 'live',
+    sources: {
+      weather: weather.source,
+      air_quality: air.source,
+      pollen: pollen.source ? `${pollen.source}${pollen.scale ? ` (${pollen.scale})` : ''}` : undefined,
+    },
+    current: {
+      temperature_c: valueOrNull(weather.temperature_c),
+      humidity: valueOrNull(weather.humidity_percent ?? weather.humidity),
+      pressure_hpa: valueOrNull(weather.pressure_hpa),
+      pressure_change_24h: valueOrNull(weather.pressure_change_24h),
+      wind_kph: valueOrNull(weather.wind_speed_kmh),
+      rain_mm: valueOrNull(weather.rain_mm),
+      aqi: valueOrNull(air.aqi ?? air.us_aqi),
+      pm25: valueOrNull(air.pm2_5),
+      ozone: valueOrNull(air.ozone),
+      pollen: { tree: valueOrNull(tree), grass: valueOrNull(grass), weed: valueOrNull(weed) },
+    },
+    // Map zones are a frontend-only illustrative overlay until the backend provides them.
+    zones_note: data.zones_note ?? environment.zones_note,
+    zones: data.zones ?? copy(environment.zones),
+    forecast: data.forecast ?? [],
+  };
+}
+
+const NORMALIZE = { environment: normalizeEnvironment };
+
 async function read(name, user) {
   if (USE_MOCK) {
     await wait(MOCK_DELAY_MS);
     return copy(MOCKS[name]);
   }
   try {
-    return await request(`/${name}?user=${encodeURIComponent(user)}`);
+    const data = await request(`/${name}?user=${encodeURIComponent(user)}`);
+    return NORMALIZE[name] ? NORMALIZE[name](data) : data;
   } catch (error) {
     console.warn(`[api] GET /${name} failed, showing mock data instead`, error);
     return { ...copy(MOCKS[name]), fromMock: true };

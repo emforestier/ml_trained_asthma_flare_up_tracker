@@ -1,0 +1,41 @@
+{
+  "user": "demo",
+  "date": "2026-09-27",
+  "risk_score": 0.68,
+  "risk_level": "high",
+  "top_factors": [
+    {
+      "feature": "tree_pollen",
+      "label": "Tree pollen",
+      "value": 4.2,
+      "unit": "index 0-5",
+      "impact": 0.21,
+      "direction": "up"
+    },
+    {
+      "feature": "pressure_change_24h",
+      "label": "Pressure drop",
+      "value": -7.5,
+      "unit": "hPa in 24h",
+      "impact": 0.12,
+      "direction": "up"
+    },
+    {
+      "feature": "puffs_above_baseline",
+      "label": "Extra rescue puffs",
+      "value": 1,
+      "unit": "puffs above your usual",
+      "impact": 0.06,
+      "direction": "up"
+    }
+  ],
+  "recommendation": {
+    "factor": "tree_pollen",
+    "text": "Tree pollen is high tomorrow. Keep windows closed, and carry your rescue inhaler if you head outside."
+  },
+  "explanation": "Your risk is high mainly because tree pollen is near its peak, and pollen has been your strongest trigger. A pressure drop ahead of tomorrow's rain adds to it.",
+  "learning": {
+    "days_logged": 21,
+    "days_needed": 14
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "user": "demo",
+  "days_logged": 21,
+  "streak": 5,
+  "xp": 340,
+  "accuracy": { "correct": 17, "total": 21 },
+  "last_prediction": { "date": "2026-09-26", "risk_score": 0.54, "risk_level": "moderate", "answered": false },
+  "entries": [
+    { "date": "2026-09-26", "puffs": 2, "pre_exercise_puffs": 1, "symptoms": { "breath": 1, "wheeze": 1, "cough": 1 }, "night_waking": false, "flare_up": false },
+    { "date": "2026-09-25", "puffs": 4, "pre_exercise_puffs": 0, "symptoms": { "breath": 2, "wheeze": 2, "cough": 1 }, "night_waking": true, "flare_up": true },
+    { "date": "2026-09-24", "puffs": 1, "pre_exercise_puffs": 0, "symptoms": { "breath": 1, "wheeze": 0, "cough": 1 }, "night_waking": false, "flare_up": false },
+    { "date": "2026-09-23", "puffs": 0, "pre_exercise_puffs": 0, "symptoms": { "breath": 0, "wheeze": 0, "cough": 1 }, "night_waking": false, "flare_up": false },
+    { "date": "2026-09-22", "puffs": 1, "pre_exercise_puffs": 1, "symptoms": { "breath": 0, "wheeze": 1, "cough": 0 }, "night_waking": false, "flare_up": false }
+  ]
+}

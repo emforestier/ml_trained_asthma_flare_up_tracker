@@ -1,0 +1,46 @@
+{
+  "user": "demo",
+  "updated": "2026-09-27",
+  "triggers": [
+    {
+      "feature": "pollen",
+      "label": "Pollen",
+      "strength": "strong",
+      "score": 0.42,
+      "discovered": true,
+      "evidence": "High pollen came before 4 of your 5 flare-ups this month."
+    },
+    {
+      "feature": "pressure_drop",
+      "label": "Pressure drops",
+      "strength": "moderate",
+      "score": 0.23,
+      "discovered": true,
+      "evidence": "Your symptoms rise the day after a pressure drop of 6 hPa or more."
+    },
+    {
+      "feature": "air_quality",
+      "label": "Air quality",
+      "strength": "weak",
+      "score": 0.09,
+      "discovered": true,
+      "evidence": "Poor air quality days slightly raise your risk."
+    },
+    {
+      "feature": "humidity",
+      "label": "Humidity",
+      "strength": "none",
+      "score": 0.0,
+      "discovered": false,
+      "evidence": "Not enough humid days yet to tell."
+    },
+    {
+      "feature": "cold_air",
+      "label": "Cold air",
+      "strength": "none",
+      "score": 0.0,
+      "discovered": false,
+      "evidence": "We'll learn this once the weather turns cold."
+    }
+  ]
+}

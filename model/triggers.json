@@ -1,0 +1,87 @@
+[
+  [
+    {
+      "factor": "pm2_5_mean",
+      "impact": -3.76442726988635,
+      "strength": "strong"
+    },
+    {
+      "factor": "temperature_2m_max",
+      "impact": 3.628951109417257,
+      "strength": "strong"
+    },
+    {
+      "factor": "pollen_3day_avg",
+      "impact": -2.2216219495349954,
+      "strength": "moderate"
+    }
+  ],
+  [
+    {
+      "factor": "pollen_3day_avg",
+      "impact": -3.37110060859778,
+      "strength": "strong"
+    },
+    {
+      "factor": "surface_pressure_mean",
+      "impact": -1.559346967957537,
+      "strength": "moderate"
+    },
+    {
+      "factor": "windspeed_10m_max",
+      "impact": -1.2612539385189643,
+      "strength": "moderate"
+    }
+  ],
+  [
+    {
+      "factor": "pollen_3day_avg",
+      "impact": 6.8547780743439395,
+      "strength": "strong"
+    },
+    {
+      "factor": "surface_pressure_mean",
+      "impact": 1.7943673914673404,
+      "strength": "weak"
+    },
+    {
+      "factor": "puffs_3day_avg",
+      "impact": 1.6445676654860404,
+      "strength": "weak"
+    }
+  ],
+  [
+    {
+      "factor": "pollen_3day_avg",
+      "impact": 6.587275730103744,
+      "strength": "strong"
+    },
+    {
+      "factor": "puffs_3day_avg",
+      "impact": 1.5500354834823853,
+      "strength": "weak"
+    },
+    {
+      "factor": "pollen",
+      "impact": 1.2468455115174473,
+      "strength": "weak"
+    }
+  ],
+  [
+    {
+      "factor": "pollen_3day_avg",
+      "impact": -4.448150759901365,
+      "strength": "strong"
+    },
+    {
+      "factor": "aqi_3day_avg",
+      "impact": 2.4525886632277443,
+      "strength": "moderate"
+    },
+    {
+      "factor": "surface_pressure_mean",
+      "impact": -1.0871223485735382,
+      "strength": "weak"
+    }
+  ]
+]

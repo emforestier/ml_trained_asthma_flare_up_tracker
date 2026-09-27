@@ -1,4 +1,5 @@
 // Shows today's worst environmental condition, like a weather badge on a game map.
+import Icon from './Icon';
 import { CONDITION_ALERTS as A } from '../config';
 
 const SEVERITY = { low: 0, moderate: 1, high: 2 };
@@ -9,17 +10,17 @@ export function worstCondition(current) {
   const [type, pollen] = pollenType;
   const candidates = [
     {
-      icon: '🌳',
+      icon: 'pollen',
       text: `Synthetic ${type} pollen`,
       level: pollen >= A.pollenHigh ? 'high' : pollen >= A.pollenModerate ? 'moderate' : 'low',
     },
     {
-      icon: '💨',
+      icon: 'air',
       text: 'Air quality',
       level: current.aqi > A.aqiHigh ? 'high' : current.aqi >= A.aqiModerate ? 'moderate' : 'low',
     },
     {
-      icon: '🌧️',
+      icon: 'pressure',
       text: 'Pressure drop',
       level:
         current.pressure_change_24h <= A.pressureDropHigh
@@ -35,11 +36,15 @@ export function worstCondition(current) {
 export default function ConditionChip({ current }) {
   const worst = worstCondition(current);
   if (worst.level === 'low') {
-    return <span className="condition-chip level-low">☀️ All clear</span>;
+    return (
+      <span className="condition-chip level-low">
+        <Icon name="clear" size={15} /> All clear
+      </span>
+    );
   }
   return (
     <span className={`condition-chip level-${worst.level}`}>
-      {worst.icon} {worst.text} {worst.level}
+      <Icon name={worst.icon} size={15} /> {worst.text} {worst.level}
     </span>
   );
 }

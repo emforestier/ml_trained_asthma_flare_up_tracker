@@ -1142,3 +1142,25 @@ code {
 .wordmark.dark { color: var(--teal-deep); }
 .wordmark-tagline { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; opacity: 0.9; }
 .onboarding .wordmark + .onboarding-companion { margin-top: 4px; }
+
+/* ---------- Icons (one line-icon set, colored by meaning) ---------- */
+.icon { display: inline-block; flex: none; vertical-align: -0.18em; }
+.round-button .icon, .menu-item .icon { color: var(--teal-deep); }
+.emergency-button .icon { color: #b3261e; }
+.close-button .icon { color: #fff; }
+.menu-screen-close .icon, .profile-close .icon { color: var(--teal); }
+.icon-streak { color: #e8742a; }
+.streak-chip, .level-streak, .streak-title { display: inline-flex; align-items: center; gap: 4px; }
+.condition-chip { display: inline-flex; align-items: center; gap: 5px; }
+.conditions .condition-rows .icon, .accuracy .icon, .learning-banner .icon { color: var(--teal); }
+.learning-banner { display: flex; align-items: center; gap: 6px; }
+.factor-icon { color: var(--teal-deep); }
+.activity-icon { color: var(--teal); }
+.profile-action-icon .icon { color: #fff; }
+.reward-banner { display: inline-flex; align-items: center; gap: 6px; }
+.reward-banner .icon { color: var(--teal); }
+.stamp .icon { color: inherit; }
+.stamp.bonus:not(.done) { color: var(--sun); }
+.medal-disc .icon { color: #fff; }
+.medal.tier-0 .medal-disc .icon { color: #8a9793; }
+.alert-close .icon { color: var(--ink-soft); }

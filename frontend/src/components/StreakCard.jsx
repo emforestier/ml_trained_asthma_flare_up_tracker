@@ -1,5 +1,6 @@
 // Seven-stamp streak card: one stamp per daily check-in; the seventh earns a bonus.
 import { STREAK_CARD_DAYS, XP_STREAK_CARD_BONUS } from '../config';
+import Icon from './Icon';
 
 // Stamps filled on the current card. A full card stays full on the day it fills.
 export function stampsFilled(streak) {
@@ -17,7 +18,9 @@ export default function StreakCard({ streak, checkedInToday, justStamped = false
     <section className="card streak-card" aria-label={`${streak}-day streak. ${shown} of ${STREAK_CARD_DAYS} stamps`}>
       <div className="streak-card-head">
         <p className="eyebrow">Streak card</p>
-        <strong>🔥 {streak}-day streak</strong>
+        <strong className="streak-title">
+          <Icon name="streak" size={17} /> {streak}-day streak
+        </strong>
       </div>
       <ol className="stamps">
         {Array.from({ length: STREAK_CARD_DAYS }, (_, index) => {
@@ -27,7 +30,7 @@ export default function StreakCard({ streak, checkedInToday, justStamped = false
           const classes = ['stamp', done && 'done', isToday && !checkedInToday && 'today', isToday && justStamped && 'pop', isBonus && 'bonus'];
           return (
             <li key={index} className={classes.filter(Boolean).join(' ')}>
-              {done ? (isBonus ? '🎁' : '✓') : isBonus ? '🎁' : index + 1}
+              {isBonus ? <Icon name="gift" size={16} /> : done ? <Icon name="check" size={16} strokeWidth={3} /> : index + 1}
             </li>
           );
         })}

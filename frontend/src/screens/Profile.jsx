@@ -11,6 +11,7 @@ import { BASELINE_WINDOW_DAYS } from '../config';
 import { notificationPermission, requestNotifications } from '../notify';
 import { MEDALS, MEDAL_TIERS, currentStreak, levelInfo, medalTier, todayString, useGame } from '../state/GameContext';
 import { NOT_SURE_TRIGGER } from '../survey';
+import Icon from '../components/Icon';
 
 const ANSWER_LABELS = [
   ['nickname', 'Name'],
@@ -42,11 +43,11 @@ function MeTab({ onOpenSettings }) {
   const history = [...today, ...earlier.filter((entry) => entry.date !== todayString())].slice(0, 7);
 
   const activity = [
-    ['📅', 'Days checked in', game.checkIns],
-    ['🔥', 'Current streak', `${streak} ${streak === 1 ? 'day' : 'days'}`],
-    ['🏅', 'Best streak', `${game.bestStreak} ${game.bestStreak === 1 ? 'day' : 'days'}`],
-    ['🎯', 'Matching outcomes', total ? `${correct} of ${total} answered days` : 'None answered yet'],
-    ['XP', 'Total XP', game.xp.toLocaleString()],
+    ['calendar', 'Days checked in', game.checkIns],
+    ['streak', 'Current streak', `${streak} ${streak === 1 ? 'day' : 'days'}`],
+    ['medal', 'Best streak', `${game.bestStreak} ${game.bestStreak === 1 ? 'day' : 'days'}`],
+    ['target', 'Matching outcomes', total ? `${correct} of ${total} answered days` : 'None answered yet'],
+    ['star', 'Total XP', game.xp.toLocaleString()],
   ];
 
   return (
@@ -71,25 +72,25 @@ function MeTab({ onOpenSettings }) {
             </p>
           </div>
           <span className="level-streak" title="Current streak">
-            🔥 {streak}
+            <Icon name="streak" size={16} /> {streak}
           </span>
         </div>
         <div className="profile-actions">
           <Link to="/profile/edit" className="profile-action">
             <span className="profile-action-icon" aria-hidden="true">
-              ✏️
+              <Icon name="edit" size={24} />
             </span>
             Edit answers
           </Link>
           <button className="profile-action" onClick={() => setPanel(panel === 'history' ? null : 'history')} aria-expanded={panel === 'history'}>
             <span className="profile-action-icon" aria-hidden="true">
-              📖
+              <Icon name="history" size={24} />
             </span>
             History
           </button>
           <button className="profile-action" onClick={onOpenSettings}>
             <span className="profile-action-icon" aria-hidden="true">
-              ⚙️
+              <Icon name="settings" size={24} />
             </span>
             Settings
           </button>
@@ -124,8 +125,8 @@ function MeTab({ onOpenSettings }) {
         <ul className="activity-list">
           {activity.map(([icon, label, value]) => (
             <li key={label}>
-              <span className="activity-icon" aria-hidden="true">
-                {icon}
+              <span className="activity-icon">
+                <Icon name={icon} size={16} />
               </span>
               <span>{label}</span>
               <strong>{value}</strong>
@@ -145,7 +146,7 @@ function MeTab({ onOpenSettings }) {
           </div>
           {stillLearning && (
             <p className="learning-banner">
-              🌱 Still learning your patterns ({game.checkIns} of {BASELINE_WINDOW_DAYS} days logged)
+              <Icon name="learning" size={17} /> Still learning your patterns ({game.checkIns} of {BASELINE_WINDOW_DAYS} days logged)
             </p>
           )}
           <dl className="answer-list">
@@ -183,8 +184,8 @@ function BadgesTab() {
           const tierName = tier ? MEDAL_TIERS[tier - 1] : 'Not earned yet';
           return (
             <li key={medal.id} className={`medal tier-${tier}`}>
-              <span className="medal-disc" aria-hidden="true">
-                {medal.icon}
+              <span className="medal-disc">
+                <Icon name={medal.icon} size={32} />
               </span>
               <strong>{medal.name}</strong>
               <span className="medal-tier">{tierName}</span>
@@ -291,14 +292,14 @@ export default function Profile() {
           Badges
         </button>
         <button className="round-button profile-settings" onClick={() => setSettingsOpen(true)} aria-label="Settings">
-          ⚙️
+          <Icon name="settings" size={20} />
         </button>
       </header>
 
       {tab === 'me' ? <MeTab onOpenSettings={() => setSettingsOpen(true)} /> : <BadgesTab />}
 
       <Link to="/" className="close-button profile-close" aria-label="Back to map">
-        ×
+        <Icon name="close" size={26} />
       </Link>
       {settingsOpen && <SettingsDialog onClose={() => setSettingsOpen(false)} />}
     </div>

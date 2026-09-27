@@ -1,6 +1,7 @@
 // Today's weather, air quality and pollen, with when the data was fetched and where it came from.
 // Pollen is always labeled synthetic, and saved fallback data is never shown as live.
 import { CITY_TIME_ZONE } from '../config';
+import Icon from './Icon';
 
 function formatTime(iso) {
   if (!iso) return 'unknown time';
@@ -20,11 +21,11 @@ export default function ConditionsCard({ environment }) {
       : 'Update time unknown';
   const pressure = current.pressure_change_24h;
   const rows = [
-    ['🌡️', 'Temperature', show(current.temperature_c, '°C')],
-    ['💧', 'Humidity', show(current.humidity, '%')],
-    ['🌧️', 'Pressure change', pressure === undefined || pressure === null ? 'Not available' : `${pressure > 0 ? '+' : pressure < 0 ? '−' : ''}${Math.abs(pressure)} hPa in 24h`],
-    ['💨', 'Air quality (AQI)', show(current.aqi)],
-    ['💨', 'PM2.5', show(current.pm25, ' µg/m³')],
+    ['temperature', 'Temperature', show(current.temperature_c, '°C')],
+    ['humidity', 'Humidity', show(current.humidity, '%')],
+    ['pressure', 'Pressure change', pressure === undefined || pressure === null ? 'Not available' : `${pressure > 0 ? '+' : pressure < 0 ? '−' : ''}${Math.abs(pressure)} hPa in 24h`],
+    ['air', 'Air quality (AQI)', show(current.aqi)],
+    ['air', 'PM2.5', show(current.pm25, ' µg/m³')],
   ];
   const pollen = current.pollen || {};
 
@@ -35,14 +36,14 @@ export default function ConditionsCard({ environment }) {
       <ul className="condition-rows">
         {rows.map(([icon, label, value]) => (
           <li key={label}>
-            <span aria-hidden="true">{icon}</span>
+            <Icon name={icon} size={18} />
             <span>{label}</span>
             <strong>{value}</strong>
           </li>
         ))}
         {Object.entries(pollen).map(([type, value]) => (
           <li key={type}>
-            <span aria-hidden="true">🌳</span>
+            <Icon name="pollen" size={18} />
             <span>
               {type[0].toUpperCase() + type.slice(1)} pollen <span className="synthetic-tag">Synthetic</span>
             </span>

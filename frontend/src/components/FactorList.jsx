@@ -1,20 +1,22 @@
 // The top factors behind the demo score, as named in the contract: { name, direction, strength },
 // with an optional value and unit. Strength is shown in words as well as bar length.
+import Icon from './Icon';
+
 const ICONS = [
-  ['pollen', '🌳'],
-  ['pressure', '🌧️'],
-  ['puff', '💊'],
-  ['air', '💨'],
-  ['pm2', '💨'],
-  ['ozone', '💨'],
-  ['humid', '💧'],
-  ['temp', '🌡️'],
+  ['pollen', 'pollen'],
+  ['pressure', 'pressure'],
+  ['puff', 'puffs'],
+  ['air', 'air'],
+  ['pm2', 'air'],
+  ['ozone', 'air'],
+  ['humid', 'humidity'],
+  ['temp', 'temperature'],
 ];
 const STRENGTH_WIDTH = { strong: 100, moderate: 62, weak: 30 };
 
 function iconFor(name) {
   const lower = name.toLowerCase();
-  return ICONS.find(([word]) => lower.includes(word))?.[1] || '•';
+  return ICONS.find(([word]) => lower.includes(word))?.[1] || 'target';
 }
 
 function formatValue({ value, unit }) {
@@ -34,8 +36,8 @@ export default function FactorList({ factors }) {
         const synthetic = factor.name.toLowerCase().includes('pollen');
         return (
           <li key={factor.name}>
-            <span className="factor-icon" aria-hidden="true">
-              {iconFor(factor.name)}
+            <span className="factor-icon">
+              <Icon name={iconFor(factor.name)} size={18} />
             </span>
             <div className="factor-body">
               <div className="factor-head">

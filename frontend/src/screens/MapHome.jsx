@@ -19,6 +19,7 @@ import { RISK_LEVELS, USE_MOCK, levelFromScore } from '../config';
 import { distanceKm } from '../geo';
 import { sendSystemNotification } from '../notify';
 import { alertsSeenToday, currentStreak, todayString, useGame } from '../state/GameContext';
+import Icon from '../components/Icon';
 
 const DEFAULT_CENTER = { lat: 29.6516, lon: -82.3248 };
 const DEFAULT_ZOOM = 16;
@@ -117,7 +118,7 @@ export default function MapHome() {
         </div>
         <div className="hud-top-right">
           <span className="streak-chip" title="Check-in streak">
-            🔥 {currentStreak(game)}
+            <Icon name="streak" size={16} /> {currentStreak(game)}
           </span>
           {USE_MOCK && <span className="mock-flag">Mock data</span>}
         </div>
@@ -125,16 +126,16 @@ export default function MapHome() {
 
       <div className="hud-right">
         <Link to="/emergency" className="round-button emergency-button" aria-label="Emergency help">
-          🚨
+          <Icon name="emergency" size={22} />
         </Link>
         <button className="round-button" onClick={() => flyTo(user.lat, user.lon, DEFAULT_ZOOM)} aria-label="Back to my location">
-          🧭
+          <Icon name="locate" size={22} />
         </button>
         <button className="round-button" onClick={() => map?.zoomIn()} disabled={zoom >= MAX_ZOOM} aria-label="Zoom in">
-          +
+          <Icon name="zoomIn" size={22} />
         </button>
         <button className="round-button" onClick={() => map?.zoomOut()} disabled={zoom <= MIN_ZOOM} aria-label="Zoom out">
-          −
+          <Icon name="zoomOut" size={22} />
         </button>
       </div>
 

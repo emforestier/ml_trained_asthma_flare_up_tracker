@@ -20,6 +20,7 @@ import {
 } from '../config';
 import { sendSystemNotification } from '../notify';
 import { currentStreak, levelInfo, todayString, useGame } from '../state/GameContext';
+import Icon from '../components/Icon';
 
 const OBJECTIVES = [
   { id: 'safety', label: 'Safety check' },
@@ -123,11 +124,19 @@ function Reward({ reward, companionName, mock, alerts }) {
       </div>
       <h1>Quest complete!</h1>
       <p className="reward-xp">+{xp} XP</p>
-      {reward.cardFilled && <p className="reward-banner">🎁 Streak card full! +{XP_STREAK_CARD_BONUS} XP bonus</p>}
-      {reward.leveledUp && <p className="reward-banner">⬆️ Level up! You're now level {level}</p>}
+      {reward.cardFilled && (
+        <p className="reward-banner">
+          <Icon name="gift" size={18} /> Streak card full! +{XP_STREAK_CARD_BONUS} XP bonus
+        </p>
+      )}
+      {reward.leveledUp && (
+        <p className="reward-banner">
+          <Icon name="levelUp" size={18} /> Level up! You're now level {level}
+        </p>
+      )}
       {reward.newBadges.map((badge) => (
         <p key={badge.id} className="reward-banner">
-          {badge.icon} New badge: {badge.name}
+          <Icon name={badge.icon} size={18} /> New badge: {badge.name}
         </p>
       ))}
       <CheckInAlerts alerts={alerts} />

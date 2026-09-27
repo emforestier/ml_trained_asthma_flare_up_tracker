@@ -9,6 +9,7 @@ import FactorList from '../components/FactorList';
 import RiskRing from '../components/RiskRing';
 import { BASELINE_WINDOW_DAYS, DISCLAIMER, MODEL_NOTE, MOOD_LINES, RISK_LEVELS, SCORE_NAME, levelFromScore } from '../config';
 import { useGame } from '../state/GameContext';
+import Icon from '../components/Icon';
 
 // The contract sends the suggestion as text; older mocks sent { text }.
 const recommendationText = (recommendation) => (typeof recommendation === 'string' ? recommendation : recommendation?.text);
@@ -41,7 +42,7 @@ export default function Forecast() {
     <div className="forecast">
       <section className={`scene level-${level}`}>
         <Link to="/" className="round-button scene-back" aria-label="Back to map">
-          ←
+          <Icon name="back" size={22} />
         </Link>
         <div className="glass-pill">
           <span>{profile.companionName}</span>
@@ -70,7 +71,7 @@ export default function Forecast() {
 
         {daysLogged < BASELINE_WINDOW_DAYS && (
           <p className="learning-banner">
-            🌱 Still learning your patterns (day {Math.max(daysLogged, 1)} of {BASELINE_WINDOW_DAYS})
+            <Icon name="learning" size={17} /> Still learning your patterns (day {Math.max(daysLogged, 1)} of {BASELINE_WINDOW_DAYS})
           </p>
         )}
 
@@ -91,7 +92,7 @@ export default function Forecast() {
 
         {total > 0 && (
           <p className="accuracy" style={{ textAlign: 'center' }}>
-            🎯 <strong>{correct}</strong> matching {correct === 1 ? 'outcome' : 'outcomes'} out of <strong>{total}</strong> answered{' '}
+            <Icon name="target" size={16} /> <strong>{correct}</strong> matching {correct === 1 ? 'outcome' : 'outcomes'} out of <strong>{total}</strong> answered{' '}
             {total === 1 ? 'day' : 'days'}
           </p>
         )}

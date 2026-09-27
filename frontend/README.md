@@ -59,3 +59,21 @@ The frontend only shows a save as successful when the POST returns a 2xx respons
 - **Reported triggers** from onboarding, used instead of the model until the user has 14 days of check-ins.
 
 If a check-in logs symptoms while a trigger is high, the alert says so. Each alert shows at most once a day, as a banner on the map and, if the user allows it, as a system notification. System notifications only work while the app is open or in a background tab; alerts with the app closed would need the backend to send push messages.
+
+## Install it on a phone (PWA)
+
+Breezy is an installable web app: it has a name, icon and full-screen mode, and a service worker caches the app (and map tiles you've viewed) so it opens instantly and works offline. `/api` health data is never cached.
+
+Phones only install apps served over **https**, so host the built app first. The simplest is Vercel's command line, run from `frontend/`:
+
+```
+npx vercel          # first time: sign in and accept the detected Vite settings
+npx vercel --prod   # publish; prints the https address
+```
+
+Then open that address on a phone:
+
+- **iPhone (Safari):** Share → **Add to Home Screen**.
+- **Android (Chrome):** menu ⋮ → **Install app** (or **Add to Home screen**).
+
+The hosted app runs in mock mode unless it has a public backend address. The service worker only runs in production builds (`npm run build` / `npm run preview`), not in `npm run dev`.

@@ -9,6 +9,17 @@ LONGITUDE = -82.3248
 TIMEZONE = "America/New_York"
 
 
+def model_conditions():
+    # Pollen and pressure change come from the same daily data and synthetic formula the model uses,
+    # so the screen and the prediction always agree. Unknown values stay None, never made up.
+    try:
+        from backend.model_service import today_conditions
+
+        return today_conditions()
+    except Exception:
+        return {"pollen": {"overall": None}, "pressure_change_24h": None}
+
+
 def fetch_environment():
     # Ask Open-Meteo for weather conditions.
     weather_response = requests.get(
@@ -49,6 +60,8 @@ def fetch_environment():
     air_data = air_response.json()
     air = air_data["current"]
 
+    conditions = model_conditions()
+
     # Translate the results into the frontend's agreed format.
     return {
         "city": CITY,
@@ -70,17 +83,13 @@ def fetch_environment():
             "temperature_c": weather.get("temperature_2m"),
             "humidity": weather.get("relative_humidity_2m"),
             "pressure_hpa": weather.get("pressure_msl"),
-            "pressure_change_24h": None,
+            "pressure_change_24h": conditions["pressure_change_24h"],
             "wind_kph": weather.get("wind_speed_10m"),
             "rain_mm": weather.get("rain"),
             "aqi": air.get("us_aqi"),
             "pm25": air.get("pm2_5"),
             "ozone": air.get("ozone"),
-            "pollen": {
-                "tree": 4.2,
-                "grass": 2.1,
-                "weed": 1.3,
-            },
+            "pollen": conditions["pollen"],
         },
         "units": {
             "temperature_c": "Celsius",

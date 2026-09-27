@@ -1,0 +1,50 @@
+{
+  "city": "Gainesville, FL",
+  "lat": 29.6516,
+  "lon": -82.3248,
+  "fetched_at": "2026-09-27T08:00:00-04:00",
+  "valid_for": "2026-09-27",
+  "is_stale": false,
+  "sources": {
+    "weather": "Open-Meteo",
+    "air_quality": "Open-Meteo",
+    "pollen": "Synthetic demo data (0–5 scale)"
+  },
+  "current": {
+    "temperature_c": 27,
+    "humidity": 71,
+    "pressure_hpa": 1009,
+    "pressure_change_24h": -7.5,
+    "wind_kph": 14,
+    "rain_mm": 0,
+    "aqi": 58,
+    "pm25": 14.2,
+    "ozone": 41,
+    "pollen": {
+      "tree": 4.2,
+      "grass": 2.1,
+      "weed": 1.3
+    }
+  },
+  "zones_note": "Illustrative demo overlay: invented zones, not measured neighborhood data.",
+  "zones": [
+    { "id": "p5", "type": "pollen", "label": "Tree pollen", "level": "high", "value": 4.4, "unit": "of 5", "lat": 29.6528, "lon": -82.3234, "radius_m": 120 },
+    { "id": "a4", "type": "air_quality", "label": "Air quality (AQI)", "level": "moderate", "value": 72, "unit": "AQI", "lat": 29.6502, "lon": -82.3260, "radius_m": 110 },
+    { "id": "w3", "type": "weather", "label": "Pressure drop", "level": "high", "value": -7.5, "unit": "hPa in 24h", "lat": 29.6532, "lon": -82.3266, "radius_m": 150 },
+    { "id": "p6", "type": "pollen", "label": "Grass pollen", "level": "moderate", "value": 2.6, "unit": "of 5", "lat": 29.6504, "lon": -82.3230, "radius_m": 110 },
+    { "id": "p1", "type": "pollen", "label": "Tree pollen", "level": "high", "value": 4.6, "unit": "of 5", "lat": 29.672, "lon": -82.352, "radius_m": 1800 },
+    { "id": "p2", "type": "pollen", "label": "Tree pollen", "level": "high", "value": 4.1, "unit": "of 5", "lat": 29.638, "lon": -82.371, "radius_m": 1500 },
+    { "id": "p3", "type": "pollen", "label": "Grass pollen", "level": "moderate", "value": 2.4, "unit": "of 5", "lat": 29.628, "lon": -82.296, "radius_m": 1400 },
+    { "id": "p4", "type": "pollen", "label": "Weed pollen", "level": "low", "value": 1.2, "unit": "of 5", "lat": 29.681, "lon": -82.289, "radius_m": 1200 },
+    { "id": "a1", "type": "air_quality", "label": "Air quality (AQI)", "level": "moderate", "value": 64, "unit": "AQI", "lat": 29.6452, "lon": -82.3262, "radius_m": 500 },
+    { "id": "a2", "type": "air_quality", "label": "Air quality (AQI)", "level": "low", "value": 38, "unit": "AQI", "lat": 29.694, "lon": -82.335, "radius_m": 1600 },
+    { "id": "a3", "type": "air_quality", "label": "Air quality (AQI)", "level": "high", "value": 104, "unit": "AQI", "lat": 29.618, "lon": -82.338, "radius_m": 900 },
+    { "id": "w1", "type": "weather", "label": "Pressure drop", "level": "high", "value": -7.5, "unit": "hPa in 24h", "lat": 29.66, "lon": -82.395, "radius_m": 2600 },
+    { "id": "w2", "type": "weather", "label": "Humidity", "level": "moderate", "value": 71, "unit": "%", "lat": 29.61, "lon": -82.27, "radius_m": 2000 }
+  ],
+  "forecast": [
+    { "date": "2026-09-28", "summary": "Rain in the afternoon", "temperature_c": 25, "pollen_tree": 3.1, "aqi": 45 },
+    { "date": "2026-09-29", "summary": "Sunny and dry", "temperature_c": 28, "pollen_tree": 4.4, "aqi": 52 },
+    { "date": "2026-09-30", "summary": "Partly cloudy", "temperature_c": 27, "pollen_tree": 3.8, "aqi": 49 }
+  ]
+}

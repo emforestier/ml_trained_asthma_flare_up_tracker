@@ -7,7 +7,6 @@ export const DEMO_USER_ID = 'demo-user-1';
 export const SURVEY_INTRO =
   'Meet your asthma companion! Answer a few questions so we can set up your profile. Estimates are okay, and you can change your answers later. For this prototype, please use fictional information.';
 
-export const NOT_SURE_TRIGGER = 'Not sure yet';
 export const NO_RESCUE_DAYS = '0 days';
 export const ZERO_PUFFS = '0 puffs';
 
@@ -65,14 +64,6 @@ export const QUESTIONS = [
     why: "This is saved as profile information. Controller doses are never counted as rescue puffs, and the app won't suggest changing your medication.",
   },
   {
-    id: 'triggers',
-    type: 'multi',
-    prompt: 'Which things have you noticed around the time your asthma symptoms get worse?',
-    helper: 'Select all that apply. These are your observations, not confirmed causes.',
-    options: ['Pollen', 'Smoke or air pollution', 'Cold air', 'Humid weather', 'Other', NOT_SURE_TRIGGER],
-    why: 'These answers personalize your starting experience. They appear as "Triggers you reported," separate from the patterns the model finds.',
-  },
-  {
     id: 'preExercise',
     type: 'single',
     prompt: 'Do you sometimes take your rescue inhaler before exercise?',
@@ -80,13 +71,6 @@ export const QUESTIONS = [
     why: "If so, check-ins let you tag those puffs so they don't count toward a flare-up.",
   },
 ];
-
-// Picking "Not sure yet" clears the other triggers; picking anything else clears "Not sure yet".
-export function toggleTrigger(selected, option) {
-  if (selected.includes(option)) return selected.filter((item) => item !== option);
-  if (option === NOT_SURE_TRIGGER) return [NOT_SURE_TRIGGER];
-  return [...selected.filter((item) => item !== NOT_SURE_TRIGGER), option];
-}
 
 const DAYS_PER_WEEK = { '0 days': 0, '1–2 days': 1.5, '3–4 days': 3.5, '5–7 days': 6 };
 const PUFFS_PER_DAY = { '0 puffs': 0, '1 puff': 1, '2 puffs': 2, '3–4 puffs': 3.5, '5 or more puffs': 5 };

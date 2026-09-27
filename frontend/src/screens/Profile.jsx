@@ -10,7 +10,6 @@ import StreakCard from '../components/StreakCard';
 import { BASELINE_WINDOW_DAYS } from '../config';
 import { notificationPermission, requestNotifications } from '../notify';
 import { MEDALS, MEDAL_TIERS, currentStreak, levelInfo, medalTier, todayString, useGame } from '../state/GameContext';
-import { NOT_SURE_TRIGGER } from '../survey';
 import Icon from '../components/Icon';
 
 const ANSWER_LABELS = [
@@ -20,7 +19,6 @@ const ANSWER_LABELS = [
   ['puffsPerDay', 'Puffs on those days'],
   ['nightWaking', 'Night waking (past 4 weeks)'],
   ['controller', 'Daily controller inhaler'],
-  ['triggers', 'Triggers you reported'],
   ['preExercise', 'Rescue inhaler before exercise'],
 ];
 
@@ -152,7 +150,7 @@ function MeTab({ onOpenSettings }) {
           <dl className="answer-list">
             {ANSWER_LABELS.map(([id, label]) => {
               const value = profile.survey?.[id];
-              const shown = Array.isArray(value) ? (value.length ? value.join(', ') : NOT_SURE_TRIGGER) : value || '—';
+              const shown = value || '—';
               return (
                 <div key={id}>
                   <dt>{label}</dt>

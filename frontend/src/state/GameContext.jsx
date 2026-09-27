@@ -80,7 +80,6 @@ const DEMO_PROFILE = {
     puffsPerDay: '2 puffs',
     nightWaking: 'Once or twice in the past four weeks',
     controller: 'Yes',
-    triggers: ['Pollen', 'Smoke or air pollution'],
     preExercise: 'Yes',
   },
   baselineEstimate: 0.43,

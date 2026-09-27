@@ -21,8 +21,8 @@ from backend.db import ROOT
 
 load_dotenv(ROOT / ".env")
 
-DEFAULT_MODEL = "gemini-2.5-flash"
-TIMEOUT_MS = 8000
+DEFAULT_MODEL = "gemini-3.1-flash-lite"  # newer flash models ignore thinking_budget=0 and run out of tokens
+TIMEOUT_MS = 15000  # Gemini rejects deadlines under 10s
 MAX_CHARS = 320
 
 # Words that mean the reply strayed into medical advice or claims.
@@ -113,9 +113,16 @@ def explain(result, cache_key=None):
         response = client.models.generate_content(
             model=os.getenv("GEMINI_MODEL", DEFAULT_MODEL),
             contents=build_prompt(facts),
-            config=types.GenerateContentConfig(temperature=0.3, max_output_tokens=150),
+            config=types.GenerateContentConfig(
+                temperature=0.3,
+                max_output_tokens=150,
+                # Thinking tokens count against max_output_tokens and cut the reply off.
+                thinking_config=types.ThinkingConfig(thinking_budget=0),
+            ),
         )
-        text = (response.text or "").strip().replace("\n", " ")
+        if response.candidates[0].finish_reason != types.FinishReason.STOP:
+            return template, "template"  # cut off or blocked; don't show half a sentence
+        text =(response.text or "").strip().replace("\n", " ")
     except Exception:  # noqa: BLE001 - any Gemini problem falls back to the template
         return template, "template"
 

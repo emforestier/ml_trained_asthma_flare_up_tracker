@@ -1,6 +1,9 @@
 """Tests for Gemini explanations (build guide, step 11). No real Gemini calls are made."""
 
+from types import SimpleNamespace
+
 import pytest
+from google.genai import types
 
 from backend import explain as ex
 
@@ -19,19 +22,20 @@ FACTS = ex.facts_for(RESULT)
 
 
 class FakeResponse:
-    def __init__(self, text):
+    def __init__(self, text, finish_reason=types.FinishReason.STOP):
         self.text = text
+        self.candidates = [SimpleNamespace(finish_reason=finish_reason)]
 
 
 class FakeModels:
-    def __init__(self, reply=None, error=None):
-        self.reply, self.error, self.calls = reply, error, 0
+    def __init__(self, reply=None, error=None, finish_reason=types.FinishReason.STOP):
+        self.reply, self.error, self.finish_reason, self.calls = reply, error, finish_reason, 0
 
     def generate_content(self, **kwargs):
         self.calls += 1
         if self.error:
             raise self.error
-        return FakeResponse(self.reply)
+        return FakeResponse(self.reply, self.finish_reason)
 
 
 class FakeClient:
@@ -86,6 +90,13 @@ def test_good_gemini_reply_is_used_and_cached(monkeypatch):
 
 def test_rejected_gemini_reply_falls_back_to_the_template(monkeypatch):
     client = FakeClient(reply="Your experimental demo score is 62%. Double your inhaler dose.")
+    monkeypatch.setattr(ex, "_get_client", lambda: client)
+    assert ex.explain(RESULT) == (RESULT["explanation"], "template")
+
+
+def test_cut_off_gemini_reply_falls_back_to_the_template(monkeypatch):
+    # Passes is_acceptable on its own, but Gemini stopped mid-sentence.
+    client = FakeClient(reply="Your experimental demo score for tomorrow", finish_reason=types.FinishReason.MAX_TOKENS)
     monkeypatch.setattr(ex, "_get_client", lambda: client)
     assert ex.explain(RESULT) == (RESULT["explanation"], "template")
 

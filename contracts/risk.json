@@ -1,0 +1,17 @@
+﻿{
+  "user_id": "demo-user-1",
+  "prediction_for": "2026-09-27",
+  "generated_at": "2026-09-26T21:00:00-04:00",
+  "risk_score": 0.62,
+  "risk_level": "elevated",
+  "top_factors": [
+    { "name": "Synthetic tree pollen", "direction": "increases", "strength": "strong", "value": 4.2, "unit": "of 5" },
+    { "name": "Pressure drop", "direction": "increases", "strength": "moderate", "value": -7.5, "unit": "hPa in 24h" },
+    { "name": "Extra rescue puffs", "direction": "increases", "strength": "weak", "value": 1, "unit": "above usual" }
+  ],
+  "recommendation": "Review your existing asthma action plan, and keep your rescue inhaler with you if you head outside.",
+  "explanation": "Your demo score is elevated mainly because synthetic pollen is high, and pollen had a strong influence on this model's predictions. A pressure drop ahead of tomorrow's rain adds to it.",
+  "days_logged": 21,
+  "data_mode": "demo",
+  "model_status": "trained_on_synthetic_patient_data"
+}

@@ -1,0 +1,13 @@
+{
+  "detail": {
+    "status": "validated_not_saved",
+    "saved": false,
+    "message": "Feedback format is valid, but storage is not connected yet.",
+    "received": {
+      "user": "demo-user-1",
+      "date": "2026-09-26",
+      "predicted_risk": 0.54,
+      "had_flare_up": false
+    }
+  }
+}

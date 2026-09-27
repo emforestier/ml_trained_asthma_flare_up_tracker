@@ -1,0 +1,13 @@
+{
+  "user": "demo-user-1",
+  "date": "2026-09-26",
+  "puffs": 3,
+  "pre_exercise_puffs": 1,
+  "symptoms": {
+    "breath": 1,
+    "wheeze": 1,
+    "cough": 0
+  },
+  "night_waking": false,
+  "emergency_signs": []
+}

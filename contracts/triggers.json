@@ -1,0 +1,47 @@
+﻿{
+  "user_id": "demo-user-1",
+  "updated": "2026-09-27",
+  "data_mode": "demo",
+  "triggers": [
+    {
+      "feature": "pollen",
+      "label": "Pollen",
+      "strength": "strong",
+      "score": 0.42,
+      "discovered": true,
+      "evidence": "Synthetic pollen was high the day before 4 of your 5 recorded flare-up days this month."
+    },
+    {
+      "feature": "pressure_drop",
+      "label": "Pressure drops",
+      "strength": "moderate",
+      "score": 0.23,
+      "discovered": true,
+      "evidence": "Drops of 6 hPa or more in a day were followed by higher demo scores."
+    },
+    {
+      "feature": "air_quality",
+      "label": "Air quality",
+      "strength": "weak",
+      "score": 0.09,
+      "discovered": true,
+      "evidence": "Poorer air quality days nudged demo scores up slightly."
+    },
+    {
+      "feature": "humidity",
+      "label": "Humidity",
+      "strength": "none",
+      "score": 0.0,
+      "discovered": false,
+      "evidence": "Not enough humid days recorded yet to tell."
+    },
+    {
+      "feature": "cold_air",
+      "label": "Cold air",
+      "strength": "none",
+      "score": 0.0,
+      "discovered": false,
+      "evidence": "No cold days recorded yet."
+    }
+  ]
+}

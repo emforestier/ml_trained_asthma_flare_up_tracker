@@ -1,3 +1,10 @@
+import sqlite3
+from backend.log_storage import read_logs, save_log
+from datetime import timedelta
+from zoneinfo import ZoneInfo
+from datetime import datetime, timezone
+from pymongo.errors import PyMongoError
+from backend.db import get_db, DatabaseUnavailable
 import requests
 import threading
 from backend.environment import fetch_environment
@@ -87,7 +94,54 @@ def get_summary(user: str = "demo-user-1"):
 
 @app.get("/log")
 def get_log(user: str = "demo-user-1"):
-    return load_sample("log")
+    try:
+        entries, mongo_available = read_logs(user)
+
+
+    except (OSError, sqlite3.Error, ValueError):
+        raise HTTPException(
+            status_code=503,
+            detail="Could not load saved check-ins. Please try again.",
+        )
+
+    # Count distinct dates, not the number of Save button clicks.
+    logged_dates = {entry["date"] for entry in entries}
+
+    today = datetime.now(
+        ZoneInfo("America/New_York")
+    ).date()
+
+    # Keep yesterday's streak active until today has passed.
+    cursor = today
+    if cursor.isoformat() not in logged_dates:
+        cursor -= timedelta(days=1)
+
+    streak = 0
+    while cursor.isoformat() in logged_dates:
+        streak += 1
+        cursor -= timedelta(days=1)
+
+    return {
+        "user": user,
+        "data_mode": "saved_logs",
+        "storage":(
+            "mongodb_and_local"
+            if mongo_available
+            else "local"
+        ),
+        "history_may_be_incomplete": not mongo_available,
+        "days_logged": len(logged_dates),
+        "streak": streak,
+        "entries": entries,
+        "xp": 0,
+        "xp_status": "managed_by_frontend",
+        "accuracy": {
+            "correct": 0,
+            "total": 0,
+        },
+        "accuracy_status": "not_calculated",
+        "last_prediction": None,
+    }
 
 
 
@@ -120,31 +174,37 @@ class DailyLog(BaseModel):
 
 @app.post("/log")
 def receive_log(log: DailyLog):
-    eligible_puffs = log.puffs - log.pre_exercise_puffs
+    # Convert the validated check-in into a database record.
+    # mode="json" converts its date to a YYYY-MM-DD string.
+    record = log.model_dump(mode="json")
+         # Temporarily skip slow environmental requests during saves.
+    record["environment"] = None
+    record["environment_status"] = "temporarily_skipped"    
 
-    symptom_total = (
+    record["eligible_rescue_puffs"] = (
+        log.puffs - log.pre_exercise_puffs
+    )
+
+    record["symptom_total"] = (
         log.symptoms.breath
         + log.symptoms.wheeze
         + log.symptoms.cough
     )
 
-    # Step 3 checks the request format.
-    # Storage will be connected in a later step.
-    raise HTTPException(
-        status_code=501,
-        detail={
-            "status": "validated_not_saved",
-            "saved": False,
-            "message": (
-                "Check-in format is valid, but storage "
-                "is not connected yet."
-            ),
-            "received": log.model_dump(mode="json"),
-            "eligible_rescue_puffs": eligible_puffs,
-            "symptom_total": symptom_total
-        }
-    )
+    now = datetime.now(timezone.utc).isoformat()
+    record["updated_at"] = now
 
+    try:
+        return save_log(record)
+
+    except (OSError, sqlite3.Error, ValueError):
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "Could not confirm a local save. "
+                "Please check available disk space and retry."
+            ),
+        )
 class SurveyAnswers(BaseModel):
     nickname: str = Field(min_length=1, max_length=20)
     city: str = Field(min_length=1)
@@ -208,3 +268,4 @@ def receive_feedback(feedback: FeedbackRequest):
             "received": feedback.model_dump(mode="json")
         }
     )
+

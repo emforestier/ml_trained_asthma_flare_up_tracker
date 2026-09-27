@@ -1,0 +1,16 @@
+{
+  "user": "demo-user-with-no-logs",
+  "data_mode": "saved_logs",
+  "storage": "mongodb",
+  "days_logged": 0,
+  "streak": 0,
+  "entries": [],
+  "xp": 0,
+  "xp_status": "managed_by_frontend",
+  "accuracy": {
+    "correct": 0,
+    "total": 0
+  },
+  "accuracy_status": "not_calculated",
+  "last_prediction": null
+}

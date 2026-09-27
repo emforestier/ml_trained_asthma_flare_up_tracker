@@ -4,7 +4,10 @@ from datetime import datetime, timezone
 from pymongo.errors import PyMongoError
 from backend.db import get_db, DatabaseUnavailable
 import requests
+import threading
 from backend.environment import fetch_environment
+from backend import model_service
+from backend.explain import explain
 import json
 from pathlib import Path
 from datetime import date as Date
@@ -22,6 +25,10 @@ def load_sample(name):
 
     with file_path.open(encoding="utf-8-sig") as file:
         return json.load(file)
+
+
+# Step 10: load the model (and connect to the database) once, in the background, at startup.
+threading.Thread(target=model_service.warm_up, daemon=True).start()
 
 @app.get("/health")
 def health():
@@ -49,12 +56,33 @@ def get_environment(user: str = "demo-user-1"):
 
 @app.get("/risk")
 def get_risk(user: str = "demo-user-1"):
-    return load_sample("risk")
+    # Step 10: Emily's model on real daily weather and saved check-ins.
+    # Step 11: Gemini rewords the computed facts, with the template as a fallback.
+    try:
+        result = model_service.risk_for(user)
+    except Exception as error:  # the app must keep working even if the model can't run
+        sample = load_sample("risk")
+        sample["data_mode"] = "sample_fallback"
+        sample["fallback_reason"] = f"{type(error).__name__}: {error}"[:200]
+        return sample
+    if result.get("status") == "insufficient_data":
+        return result
+    text, source = explain(result, cache_key=f"{user}:{result['prediction_for']}:{result['risk_score']}")
+    result["explanation"] = text
+    result["explanation_source"] = source
+    return result
 
 
 @app.get("/triggers")
 def get_triggers(user: str = "demo-user-1"):
-    return load_sample("triggers")
+    # Which trigger groups the model leaned on across the user's recent days.
+    try:
+        return model_service.trigger_profile(user)
+    except Exception as error:
+        sample = load_sample("triggers")
+        sample["data_mode"] = "sample_fallback"
+        sample["fallback_reason"] = f"{type(error).__name__}: {error}"[:200]
+        return sample
 
 
 @app.get("/summary")

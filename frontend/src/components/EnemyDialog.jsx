@@ -13,9 +13,9 @@ function triggerFeature(zone) {
 }
 
 function modelLine(trigger, enoughHistory) {
-  if (!enoughHistory) return "Not enough check-ins yet to see how this affects the demo model's predictions for you.";
-  if (!trigger || !trigger.discovered || trigger.strength === 'none') return 'No clear influence on the demo model yet.';
-  return `${trigger.label} had a ${trigger.strength} influence on this demo model's predictions.`;
+  if (!enoughHistory) return 'Not enough check-ins yet to see how this affects your predictions.';
+  if (!trigger || !trigger.discovered || trigger.strength === 'none') return 'No clear influence on the model yet.';
+  return `${trigger.label} had a ${trigger.strength} influence on the model's predictions.`;
 }
 
 export default function EnemyDialog({ zone, triggers, onClose }) {
@@ -41,7 +41,7 @@ export default function EnemyDialog({ zone, triggers, onClose }) {
           <div className="dialog-enemy">
             <Enemy type={zone.type} level={zone.level} size={110} />
           </div>
-          <p className="overlay-tag">Illustrative demo overlay, not measured neighborhood data</p>
+          <p className="overlay-tag">Illustrative zones, not measured neighborhood data</p>
         </>
       }
     />

@@ -22,8 +22,8 @@ export const MOOD_LINES = {
   high: "Higher score for tomorrow. Let's get ready together.",
 };
 
-export const SCORE_NAME = 'Experimental demo score';
-export const MODEL_NOTE = 'Demo model trained on simulated patient data. Not a medical prediction or diagnosis.';
+export const SCORE_NAME = 'Asthma risk estimate';
+export const MODEL_NOTE = 'This experimental model was trained on simulated patient data. Not a medical prediction or diagnosis.';
 
 // Used only if the backend sends a score without a level.
 export function levelFromScore(score) {

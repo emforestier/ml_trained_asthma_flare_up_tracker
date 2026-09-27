@@ -43,7 +43,7 @@ function PatternCard({ trigger }) {
           <span style={{ width: `${STRENGTH_WIDTH[trigger.strength] || 50}%` }} />
         </div>
         <p>
-          {trigger.label} had a {trigger.strength} influence on this demo model's predictions.
+          {trigger.label} had a {trigger.strength} influence on the model's predictions.
         </p>
         {trigger.evidence && <p className="muted">{trigger.evidence}</p>}
       </div>
@@ -53,8 +53,8 @@ function PatternCard({ trigger }) {
 
 export default function Patterns() {
   const { profile, game } = useGame();
-  const triggers = useApi(getTriggers);
-  const summary = useApi(getSummary);
+  const triggers = useApi(getTriggers, profile.user, game.checkIns);
+  const summary = useApi(getSummary, profile.user, game.checkIns);
 
   const daysLogged = profile.isDemo ? Math.max(game.checkIns, BASELINE_WINDOW_DAYS) : game.checkIns;
   const enoughHistory = daysLogged >= BASELINE_WINDOW_DAYS;
@@ -80,7 +80,7 @@ export default function Patterns() {
 
       <section className="card">
         <div className="section-head">
-          <p className="eyebrow">Patterns the demo model found</p>
+          <p className="eyebrow">Patterns from your check-ins</p>
           {enoughHistory && triggers.data && (
             <span className="found-count">
               {found} of {sorted.length} found
@@ -93,7 +93,7 @@ export default function Patterns() {
             <Companion mood="happy" size={110} />
             <h2>Still learning your patterns</h2>
             <p className="muted">
-              The demo model needs about {BASELINE_WINDOW_DAYS} days of check-ins before it can show which conditions influence your
+              The model needs about {BASELINE_WINDOW_DAYS} days of check-ins before it can show which conditions influence your
               predictions. Keep checking in each day.
             </p>
             <div className="learning-progress" aria-label={`${daysLogged} of ${BASELINE_WINDOW_DAYS} days logged`}>
@@ -115,7 +115,7 @@ export default function Patterns() {
       </section>
 
 
-      <p className="patterns-note">Patterns describe how this demo model makes predictions, not proven causes. {MODEL_NOTE}</p>
+      <p className="patterns-note">Patterns describe model influence, not proven causes. {MODEL_NOTE}</p>
     </div>
   );
 }

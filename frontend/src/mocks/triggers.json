@@ -17,7 +17,7 @@
       "strength": "moderate",
       "score": 0.23,
       "discovered": true,
-      "evidence": "Drops of 6 hPa or more in a day were followed by higher demo scores."
+      "evidence": "Drops of 6 hPa or more in a day were followed by higher risk estimates."
     },
     {
       "feature": "air_quality",
@@ -25,7 +25,7 @@
       "strength": "weak",
       "score": 0.09,
       "discovered": true,
-      "evidence": "Poorer air quality days nudged demo scores up slightly."
+      "evidence": "Poorer air quality days nudged risk estimates up slightly."
     },
     {
       "feature": "humidity",

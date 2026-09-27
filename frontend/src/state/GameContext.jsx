@@ -12,7 +12,7 @@ import {
   XP_STREAK_CARD_BONUS,
 } from '../config';
 import demoLog from '../mocks/log.json';
-import { DEMO_USER_ID } from '../survey';
+import { createUserId, DEMO_USER_ID } from '../survey';
 
 const STORAGE_KEY = 'breezy-state-v2';
 
@@ -52,7 +52,7 @@ const EMPTY_GAME = {
   alertsSeen: { date: null, ids: [] },
 };
 
-// The demo user arrives with three weeks of history, checked in through yesterday.
+// The demo user arrives with Alexis's 31-day history, checked in through yesterday.
 function demoGame() {
   return {
     ...EMPTY_GAME,
@@ -70,11 +70,11 @@ const DEMO_PROFILE = {
   onboarded: true,
   isDemo: true,
   user: DEMO_USER_ID,
-  nickname: 'Sam',
+  nickname: 'Alexis',
   city: 'Gainesville, FL',
   companionName: DEFAULT_COMPANION_NAME,
   survey: {
-    nickname: 'Sam',
+    nickname: 'Alexis',
     city: 'Gainesville, FL',
     rescueDays: '1–2 days',
     puffsPerDay: '2 puffs',
@@ -88,7 +88,7 @@ const DEMO_PROFILE = {
 const EMPTY_PROFILE = {
   onboarded: false,
   isDemo: false,
-  user: DEMO_USER_ID,
+  user: null,
   nickname: '',
   city: '',
   companionName: DEFAULT_COMPANION_NAME,
@@ -99,7 +99,12 @@ const EMPTY_PROFILE = {
 function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (saved && saved.profile && saved.game) return saved;
+    if (saved && saved.profile && saved.game) {
+      if (!saved.profile.isDemo && saved.profile.user === DEMO_USER_ID) {
+        return { ...saved, profile: { ...saved.profile, user: createUserId() } };
+      }
+      return saved;
+    }
   } catch {
     // Storage blocked or corrupt: start fresh.
   }

@@ -49,7 +49,6 @@ export default function App() {
           <aside className="stage-brand">
             <Wordmark tagline />
             <p>Learns your personal asthma triggers and gives you a heads-up the day before a likely flare-up.</p>
-            <p className="stage-note">Prototype · fictional demo data</p>
           </aside>
           <div className="phone">
             <span className="phone-island" aria-hidden="true" />

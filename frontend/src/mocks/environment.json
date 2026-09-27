@@ -8,7 +8,7 @@
   "sources": {
     "weather": "Open-Meteo",
     "air_quality": "Open-Meteo",
-    "pollen": "Synthetic demo data (0–5 scale)"
+    "pollen": "Synthetic pollen index (0–5 scale)"
   },
   "current": {
     "temperature_c": 27,

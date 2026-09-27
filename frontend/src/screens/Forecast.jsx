@@ -16,8 +16,8 @@ const recommendationText = (recommendation) => (typeof recommendation === 'strin
 
 export default function Forecast() {
   const { profile, game } = useGame();
-  const risk = useApi(getRisk);
-  const environment = useApi(getEnvironment);
+  const risk = useApi(getRisk, profile.user, game.checkIns);
+  const environment = useApi(getEnvironment, profile.user);
 
   if (risk.loading || !risk.data) {
     return (
@@ -26,6 +26,34 @@ export default function Forecast() {
           <p className="scene-line" style={{ marginTop: 160 }}>
             {profile.companionName} is checking the air…
           </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (risk.data.status === 'insufficient_data') {
+    return (
+      <div className="forecast">
+        <section className="scene level-low">
+          <Link to="/" className="round-button scene-back" aria-label="Back to map">
+            <Icon name="back" size={22} />
+          </Link>
+          <div className="scene-companion">
+            <Companion mood="happy" size={170} label={`${profile.companionName} is ready for your first check-in`} />
+          </div>
+          <p className="scene-line">Your forecast starts with your first check-in.</p>
+        </section>
+        <div className="sheet">
+          <div className="sheet-handle" />
+          <section className="card">
+            <p className="eyebrow">Your first day</p>
+            <h2>No check-ins yet</h2>
+            <p>Complete today's check-in to begin building your history and get a forecast.</p>
+            <Link to="/check-in" className="pill-button as-link">
+              Start today's check-in
+            </Link>
+          </section>
+          <p className="disclaimer">{DISCLAIMER}</p>
         </div>
       </div>
     );
@@ -47,7 +75,7 @@ export default function Forecast() {
         <div className="glass-pill">
           <span>{profile.companionName}</span>
           <span className="divider">/</span>
-          <small>DEMO SCORE</small>
+          <small>FORECAST</small>
           <strong>{Math.round(score * 100)}%</strong>
         </div>
         <div className="scene-companion">
@@ -83,7 +111,7 @@ export default function Forecast() {
         )}
 
         <section className="card">
-          <p className="eyebrow">What the demo model weighed most</p>
+          <p className="eyebrow">What the model weighed most</p>
           <FactorList factors={factors} />
           {explanation && <p className="explanation">{explanation}</p>}
         </section>

@@ -8,7 +8,7 @@ export default function RiskRing({ score, level }) {
   const percent = Math.round(score * 100);
   const { label, color } = RISK_LEVELS[level];
   return (
-    <div className="risk-ring" role="img" aria-label={`Experimental demo score for tomorrow: ${percent}%, ${label.toLowerCase()}`}>
+    <div className="risk-ring" role="img" aria-label={`Asthma risk estimate for tomorrow: ${percent}%, ${label.toLowerCase()}`}>
       <svg width="112" height="112" viewBox="0 0 112 112" aria-hidden="true">
         <circle cx="56" cy="56" r={RADIUS} fill="none" stroke="var(--line)" strokeWidth="10" />
         <circle

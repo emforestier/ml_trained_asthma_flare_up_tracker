@@ -95,7 +95,7 @@ export function buildTriggerAlerts({ environment, triggers, profile, game, entry
     const lead = symptoms
       ? `You logged symptoms today while ${situation} near you.`
       : `${capitalize(situation)} near you today.`;
-    const reason = `${trigger.label} had a ${strength} influence on this demo model's predictions for you.`;
+    const reason = `${trigger.label} had a ${strength} influence on the model's predictions for you.`;
     const body = `${lead} ${reason} You may be more likely to have a flare-up. Consider keeping your rescue inhaler with you and reviewing your asthma action plan.`;
 
     alerts.push({

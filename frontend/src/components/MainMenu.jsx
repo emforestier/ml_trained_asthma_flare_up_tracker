@@ -5,7 +5,7 @@ import Wordmark from './Wordmark';
 import Icon from './Icon';
 
 const ITEMS = [
-  { to: '/forecast', icon: 'score', label: 'Demo score' },
+  { to: '/forecast', icon: 'score', label: 'Forecast' },
   { to: '/check-in', icon: 'checkIn', label: 'Check-in' },
   { to: '/triggers', icon: 'patterns', label: 'Patterns' },
   { to: '/profile', icon: 'profile', label: 'Profile' },

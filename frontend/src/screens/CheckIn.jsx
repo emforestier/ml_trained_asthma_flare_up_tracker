@@ -99,7 +99,7 @@ function useCountUp(target, duration = 900) {
 }
 
 function SaveNote({ mock }) {
-  return mock ? <p className="save-note">Demo save: stored in this browser only.</p> : <p className="save-note">Saved.</p>;
+  return mock ? <p className="save-note">Saved on this device.</p> : <p className="save-note">Saved.</p>;
 }
 
 // Cautions raised by this check-in, shown on the reward and update screens.
@@ -172,8 +172,8 @@ function Updated({ streak, mock, alerts }) {
 export default function CheckIn() {
   const navigate = useNavigate();
   const { profile, game, recordCheckIn, markAlertsSeen } = useGame();
-  const environment = useApi(getEnvironment);
-  const triggers = useApi(getTriggers);
+  const environment = useApi(getEnvironment, profile.user);
+  const triggers = useApi(getTriggers, profile.user, game.checkIns);
   const previous = game.lastCheckInDate === todayString() ? game.todayEntry : null;
   const [editing, setEditing] = useState(false);
   const [step, setStep] = useState(0);

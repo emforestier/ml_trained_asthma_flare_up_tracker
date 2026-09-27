@@ -25,7 +25,7 @@ export default function AlertToast({ alert, remaining = 0, inline = false, onDis
         <div className="alert-actions">
           {onOpen && (
             <button className="text-button small" onClick={onOpen}>
-              See demo score
+              See forecast
             </button>
           )}
           {permission === 'default' && (

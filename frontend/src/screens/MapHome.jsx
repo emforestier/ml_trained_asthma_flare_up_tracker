@@ -15,7 +15,7 @@ import MenuEmblem from '../components/MenuEmblem';
 import MapEntities, { MIN_ENEMY_ZOOM } from '../components/MapEntities';
 import NearbyPanel from '../components/NearbyPanel';
 import TrainerBadge from '../components/TrainerBadge';
-import { RISK_LEVELS, USE_MOCK, levelFromScore } from '../config';
+import { RISK_LEVELS, levelFromScore } from '../config';
 import { distanceKm } from '../geo';
 import { sendSystemNotification } from '../notify';
 import { alertsSeenToday, currentStreak, todayString, useGame } from '../state/GameContext';
@@ -29,10 +29,10 @@ const MAX_ZOOM = 19;
 export default function MapHome() {
   const navigate = useNavigate();
   const { profile, game, markAlertsSeen } = useGame();
-  const risk = useApi(getRisk);
-  const environment = useApi(getEnvironment);
-  const triggers = useApi(getTriggers);
-  const log = useApi(getLog);
+  const risk = useApi(getRisk, profile.user, game.checkIns);
+  const environment = useApi(getEnvironment, profile.user);
+  const triggers = useApi(getTriggers, profile.user, game.checkIns);
+  const log = useApi(getLog, profile.user, game.checkIns);
   const [map, setMap] = useState(null);
   const [zoom, setZoom] = useState(DEFAULT_ZOOM);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -40,7 +40,8 @@ export default function MapHome() {
   // Decided once on open, so answering doesn't close the dialog before the thank-you step.
   const [feedbackOpen, setFeedbackOpen] = useState(() => game.lastFeedbackDate !== todayString());
 
-  const level = risk.data ? risk.data.risk_level || levelFromScore(risk.data.risk_score) : 'low';
+  const hasPrediction = risk.data?.risk_score !== undefined && risk.data?.risk_score !== null;
+  const level = hasPrediction ? risk.data.risk_level || levelFromScore(risk.data.risk_score) : 'low';
   const userLat = environment.data?.lat ?? DEFAULT_CENTER.lat;
   const userLon = environment.data?.lon ?? DEFAULT_CENTER.lon;
   const user = useMemo(() => ({ lat: userLat, lon: userLon }), [userLat, userLon]);
@@ -104,23 +105,22 @@ export default function MapHome() {
 
       <div className="hud-top">
         <div className="hud-top-left">
-          {risk.data && (
-            <Link to="/forecast" className="glass-pill risk-pill" aria-label={`Experimental demo score for tomorrow: ${Math.round(risk.data.risk_score * 100)}%, ${RISK_LEVELS[level].label}`}>
+          {hasPrediction && (
+            <Link to="/forecast" className="glass-pill risk-pill" aria-label={`Asthma risk estimate for tomorrow: ${Math.round(risk.data.risk_score * 100)}%, ${RISK_LEVELS[level].label}`}>
               <span className="risk-dot" style={{ background: RISK_LEVELS[level].color }} />
-              <small>DEMO SCORE</small>
+              <small>FORECAST</small>
               <span className="divider">/</span>
               <strong>{Math.round(risk.data.risk_score * 100)}%</strong>
               <small>{RISK_LEVELS[level].label.toUpperCase()}</small>
             </Link>
           )}
           {environment.data && <ConditionChip current={environment.data.current} />}
-          {zones.length > 0 && <span className="overlay-tag on-map">Illustrative demo overlay</span>}
+          {zones.length > 0 && <span className="overlay-tag on-map">Illustrative zones</span>}
         </div>
         <div className="hud-top-right">
           <span className="streak-chip" title="Check-in streak">
             <Icon name="streak" size={16} /> {currentStreak(game)}
           </span>
-          {USE_MOCK && <span className="mock-flag">Mock data</span>}
         </div>
       </div>
 

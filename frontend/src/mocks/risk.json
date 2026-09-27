@@ -10,8 +10,8 @@
     { "name": "Extra rescue puffs", "direction": "increases", "strength": "weak", "value": 1, "unit": "above usual" }
   ],
   "recommendation": "Review your existing asthma action plan, and keep your rescue inhaler with you if you head outside.",
-  "explanation": "Your demo score is elevated mainly because synthetic pollen is high, and pollen had a strong influence on this model's predictions. A pressure drop ahead of tomorrow's rain adds to it.",
-  "days_logged": 21,
+  "explanation": "Tomorrow's risk estimate is elevated mainly because synthetic pollen is high, and pollen had a strong influence on this model's predictions. A pressure drop ahead of tomorrow's rain adds to it.",
+  "days_logged": 31,
   "data_mode": "demo",
   "model_status": "trained_on_synthetic_patient_data"
 }

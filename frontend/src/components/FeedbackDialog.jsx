@@ -58,7 +58,7 @@ export default function FeedbackDialog({ lastPrediction, onClose }) {
   return (
     <GameDialog
       title="Did you have a flare-up yesterday?"
-      message={`Yesterday's experimental demo score was ${percent}%.`}
+      message={`Yesterday's asthma risk estimate was ${percent}%.`}
       confirmLabel="Yes"
       cancelLabel="No"
       busy={step === 'sending'}

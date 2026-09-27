@@ -7,7 +7,7 @@ import Companion from '../components/Companion';
 import Wordmark from '../components/Wordmark';
 import { DEFAULT_COMPANION_NAME, DISCLAIMER } from '../config';
 import { useGame } from '../state/GameContext';
-import { DEMO_USER_ID, NO_RESCUE_DAYS, QUESTIONS, SURVEY_INTRO, ZERO_PUFFS, baselineEstimate } from '../survey';
+import { createUserId, DEMO_USER_ID, NO_RESCUE_DAYS, QUESTIONS, SURVEY_INTRO, ZERO_PUFFS, baselineEstimate } from '../survey';
 
 const EMPTY_ANSWERS = { nickname: '', city: QUESTIONS[1].options[0] };
 
@@ -27,6 +27,7 @@ export default function Onboarding({ mode = 'create' }) {
   const [step, setStep] = useState(editing ? 0 : 'intro'); // 'intro', a question index, or 'done'
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(null);
+  const [newUserId] = useState(() => createUserId());
 
   const visible = QUESTIONS.filter((question) => !question.skipWhen?.(answers));
   const index = typeof step === 'number' ? step : -1;
@@ -48,7 +49,7 @@ export default function Onboarding({ mode = 'create' }) {
       puffsPerDay: answers.rescueDays === NO_RESCUE_DAYS ? ZERO_PUFFS : answers.puffsPerDay,
     };
     const profile = {
-      user: editing ? savedProfile.user : DEMO_USER_ID,
+      user: editing ? savedProfile.user : newUserId,
       nickname: survey.nickname,
       city: survey.city,
       companionName: DEFAULT_COMPANION_NAME,
@@ -94,7 +95,7 @@ export default function Onboarding({ mode = 'create' }) {
             Let's go
           </button>
           <button className="text-button" onClick={startDemo}>
-            Use the demo profile instead
+            Explore Alexis's profile instead
           </button>
         </div>
       </div>

@@ -32,7 +32,7 @@ export default function ConditionsCard({ environment }) {
   return (
     <section className="card conditions">
       <p className="eyebrow">Today's conditions · {city}</p>
-      {(isStale || fromMock) && <p className="stale-note">Saved demo data, not a live reading.</p>}
+      {(isStale || fromMock) && <p className="stale-note">Some readings may be out of date.</p>}
       <ul className="condition-rows">
         {rows.map(([icon, label, value]) => (
           <li key={label}>
@@ -53,7 +53,7 @@ export default function ConditionsCard({ environment }) {
       </ul>
       <p className="muted conditions-source">
         {when}. Weather: {sources.weather || 'unknown'}. Air quality: {sources.air_quality || 'unknown'}. Pollen:{' '}
-        {sources.pollen || 'synthetic demo data'}.
+        {sources.pollen || 'synthetic pollen index'}.
       </p>
     </section>
   );

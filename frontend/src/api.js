@@ -2,7 +2,7 @@
 // With USE_MOCK on, reads come from src/mocks. With it off, reads go to FastAPI and fall back
 // to the mocks if a request fails, so the demo keeps working if the backend goes down.
 import { useCallback, useEffect, useState } from 'react';
-import { API_BASE_URL, USE_MOCK } from './config';
+import { API_BASE_URL, CITY_TIME_ZONE, USE_MOCK } from './config';
 import { DEMO_USER_ID } from './survey';
 import risk from './mocks/risk.json';
 import triggers from './mocks/triggers.json';
@@ -32,6 +32,50 @@ async function request(path, options = {}) {
   } finally {
     clearTimeout(timer);
   }
+}
+
+function cityDate(offsetDays = 0) {
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: CITY_TIME_ZONE });
+  const date = new Date(`${today}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + offsetDays);
+  return date.toISOString().slice(0, 10);
+}
+
+function mockResponse(name, user, checkIns = 0) {
+  if (user === DEMO_USER_ID) {
+    const data = copy(MOCKS[name]);
+    if (name === 'log') {
+      data.entries = data.entries.map((entry, index) => ({ ...entry, date: cityDate(-index - 1) }));
+    }
+    return data;
+  }
+
+  if (name === 'risk') {
+    if (checkIns < 1) {
+      return { user_id: user, status: 'insufficient_data', message: 'Complete your first daily check-in to start your forecast.', data_mode: 'no_history' };
+    }
+    return { ...copy(risk), user_id: user, days_logged: checkIns };
+  }
+  if (name === 'triggers') {
+    const data = copy(triggers);
+    data.user_id = user;
+    data.days_used = checkIns;
+    data.triggers = data.triggers.map((trigger) => ({
+      ...trigger,
+      strength: 'none',
+      score: 0,
+      discovered: false,
+      evidence: checkIns < 14 ? `Needs 14 days of check-ins (currently ${checkIns}).` : 'Your personal patterns are still being calculated.',
+    }));
+    return data;
+  }
+  if (name === 'log') {
+    return { user, days_logged: checkIns, streak: 0, xp: 0, accuracy: { correct: 0, total: 0 }, last_prediction: null, entries: [] };
+  }
+  if (name === 'summary') {
+    return { user_id: user, check_ins: checkIns, flare_ups: 0, days_in_week: 7, text: 'Your activity summary will appear as your check-ins accumulate.' };
+  }
+  return copy(MOCKS[name]);
 }
 
 // The backend's /environment nests weather, air_quality and pollen. The screens read one flat
@@ -79,17 +123,17 @@ export function normalizeEnvironment(data) {
 
 const NORMALIZE = { environment: normalizeEnvironment };
 
-async function read(name, user) {
+async function read(name, user, checkIns = 0) {
   if (USE_MOCK) {
     await wait(MOCK_DELAY_MS);
-    return copy(MOCKS[name]);
+    return mockResponse(name, user, checkIns);
   }
   try {
     const data = await request(`/${name}?user=${encodeURIComponent(user)}`);
     return NORMALIZE[name] ? NORMALIZE[name](data) : data;
   } catch (error) {
     console.warn(`[api] GET /${name} failed, showing mock data instead`, error);
-    return { ...copy(MOCKS[name]), fromMock: true };
+    return { ...mockResponse(name, user, checkIns), fromMock: true };
   }
 }
 
@@ -110,11 +154,11 @@ async function send(name, body) {
 }
 
 // Reads (one per contract file).
-export const getRisk = (user = DEMO_USER_ID) => read('risk', user);
-export const getTriggers = (user = DEMO_USER_ID) => read('triggers', user);
+export const getRisk = (user = DEMO_USER_ID, checkIns = 0) => read('risk', user, checkIns);
+export const getTriggers = (user = DEMO_USER_ID, checkIns = 0) => read('triggers', user, checkIns);
 export const getEnvironment = (user = DEMO_USER_ID) => read('environment', user);
-export const getLog = (user = DEMO_USER_ID) => read('log', user);
-export const getSummary = (user = DEMO_USER_ID) => read('summary', user);
+export const getLog = (user = DEMO_USER_ID, checkIns = 0) => read('log', user, checkIns);
+export const getSummary = (user = DEMO_USER_ID, checkIns = 0) => read('summary', user, checkIns);
 
 // Writes.
 // entry: { user, date, puffs (total, including pre-exercise), pre_exercise_puffs, symptoms: {breath, wheeze, cough},
@@ -126,19 +170,19 @@ export const saveFeedback = (feedback) => send('feedback', feedback);
 export const saveProfile = (profile) => send('profile', profile);
 
 // Loads one endpoint for a screen: const { data, loading } = useApi(getRisk);
-export function useApi(loader) {
+export function useApi(loader, user, checkIns = 0) {
   const [state, setState] = useState({ data: null, loading: true, error: null });
 
   const load = useCallback(() => {
     let active = true;
     setState((previous) => ({ ...previous, loading: true }));
-    loader()
+    loader(user, checkIns)
       .then((data) => active && setState({ data, loading: false, error: null }))
       .catch((error) => active && setState({ data: null, loading: false, error }));
     return () => {
       active = false;
     };
-  }, [loader]);
+  }, [loader, user, checkIns]);
 
   useEffect(() => load(), [load]);
   return { ...state, reload: load };

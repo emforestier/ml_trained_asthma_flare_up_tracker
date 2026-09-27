@@ -28,7 +28,7 @@ function formatDate(date) {
 
 function MeTab({ onOpenSettings }) {
   const { profile, game } = useGame();
-  const log = useApi(getLog);
+  const log = useApi(getLog, profile.user, game.checkIns);
   const [panel, setPanel] = useState(null);
   const { level, progress, needed } = levelInfo(game.xp);
   const streak = currentStreak(game);
@@ -38,7 +38,7 @@ function MeTab({ onOpenSettings }) {
   // Recent check-ins: today's (if any) plus the saved history from the log.
   const today = game.lastCheckInDate === todayString() && game.todayEntry ? [{ ...game.todayEntry, date: todayString() }] : [];
   const earlier = profile.isDemo ? log.data?.entries || [] : [];
-  const history = [...today, ...earlier.filter((entry) => entry.date !== todayString())].slice(0, 7);
+  const history = [...today, ...earlier.filter((entry) => entry.date !== todayString())].slice(0, 14);
 
   const activity = [
     ['calendar', 'Days checked in', game.checkIns],
@@ -159,7 +159,7 @@ function MeTab({ onOpenSettings }) {
               );
             })}
           </dl>
-          <p className="muted">Fictional prototype data. You can change these answers any time.</p>
+          <p className="muted">You can change these answers any time.</p>
         </div>
       </section>
     </>
@@ -248,8 +248,8 @@ function SettingsDialog({ onClose }) {
         {!profile.isDemo && (
           <div className="settings-row">
             <span>
-              Demo profile
-              <small>Three weeks of example history</small>
+              Alexis profile
+              <small>14 days of synthetic check-ins</small>
             </span>
             <button
               className="text-button small"

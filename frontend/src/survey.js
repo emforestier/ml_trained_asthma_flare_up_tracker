@@ -4,8 +4,13 @@ import { DEFAULT_CITY } from './config';
 
 export const DEMO_USER_ID = 'demo-user-1';
 
+export function createUserId() {
+  const randomId = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  return `user-${randomId}`;
+}
+
 export const SURVEY_INTRO =
-  'Meet your asthma companion! Answer a few questions so we can set up your profile. Estimates are okay, and you can change your answers later. For this prototype, please use fictional information.';
+  'Meet your asthma companion! Answer a few questions so we can set up your profile. Estimates are okay, and you can change your answers later.';
 
 export const NO_RESCUE_DAYS = '0 days';
 export const ZERO_PUFFS = '0 puffs';

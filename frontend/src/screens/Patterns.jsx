@@ -1,12 +1,10 @@
-// Patterns: what the demo model weighs for this user, kept separate from the triggers the user
-// reported. Describes model influence, never proven causes. New users see a "still learning"
+// Patterns: what the demo model weighs for this user. Describes model influence, never proven causes. New users see a "still learning"
 // view until they have enough check-ins.
 import { getSummary, getTriggers, useApi } from '../api';
 import Companion from '../components/Companion';
 import Enemy from '../components/Enemy';
 import { BASELINE_WINDOW_DAYS, MODEL_NOTE } from '../config';
 import { useGame } from '../state/GameContext';
-import { NOT_SURE_TRIGGER } from '../survey';
 
 // Which enemy creature stands for each trigger.
 const ENEMY_FOR = { pollen: 'pollen', air_quality: 'air_quality', pressure_drop: 'weather', humidity: 'weather', cold_air: 'weather' };
@@ -60,7 +58,6 @@ export default function Patterns() {
 
   const daysLogged = profile.isDemo ? Math.max(game.checkIns, BASELINE_WINDOW_DAYS) : game.checkIns;
   const enoughHistory = daysLogged >= BASELINE_WINDOW_DAYS;
-  const reported = profile.survey?.triggers || [];
   const sorted = [...(triggers.data?.triggers || [])].sort(
     (a, b) => Number(b.discovered) - Number(a.discovered) || (b.score || 0) - (a.score || 0),
   );
@@ -117,19 +114,6 @@ export default function Patterns() {
         )}
       </section>
 
-      <section className="card">
-        <p className="eyebrow">Triggers you reported</p>
-        <p className="muted">Your own observations from onboarding, not confirmed causes.</p>
-        {reported.length === 0 || (reported.length === 1 && reported[0] === NOT_SURE_TRIGGER) ? (
-          <p className="reported-empty">You weren't sure yet. That's fine: the patterns above will fill in as you check in.</p>
-        ) : (
-          <ul className="reported-list">
-            {reported.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        )}
-      </section>
 
       <p className="patterns-note">Patterns describe how this demo model makes predictions, not proven causes. {MODEL_NOTE}</p>
     </div>

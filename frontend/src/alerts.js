@@ -1,6 +1,6 @@
 // Trigger alerts: cautions raised when one of the user's triggers is high near them today.
-// Which triggers count comes from the model's per-user trigger profile (triggers.json). Until a
-// user has enough history, it comes from the triggers they reported during onboarding instead.
+// Which triggers count comes from the model's per-user trigger profile (triggers.json), so alerts
+// start once a user has enough check-ins for the model to learn their patterns.
 // Wording says "may" and describes model influence, never proven causes or medication changes.
 import { BASELINE_WINDOW_DAYS, CONDITION_ALERTS as A } from './config';
 
@@ -10,13 +10,12 @@ const band = (value, high, moderate, lowerIsWorse = false) => {
   return value >= high ? 'high' : value >= moderate ? 'moderate' : 'low';
 };
 
-// One rule per trigger: where it lives in triggers.json and the survey, how bad it is today,
+// One rule per trigger: where it lives in triggers.json, how bad it is today,
 // and how to describe it.
 const RULES = [
   {
     id: 'pollen',
     feature: 'pollen',
-    reported: 'Pollen',
     enemy: 'pollen',
     title: 'Heads up: pollen near you',
     level: (c) => {
@@ -31,7 +30,6 @@ const RULES = [
   {
     id: 'air_quality',
     feature: 'air_quality',
-    reported: 'Smoke or air pollution',
     enemy: 'air_quality',
     title: 'Heads up: air quality near you',
     level: (c) => (c.aqi === null || c.aqi === undefined ? null : c.aqi > A.aqiHigh ? 'high' : c.aqi >= A.aqiModerate ? 'moderate' : 'low'),
@@ -40,7 +38,6 @@ const RULES = [
   {
     id: 'pressure_drop',
     feature: 'pressure_drop',
-    reported: null,
     enemy: 'weather',
     title: 'Heads up: a big pressure drop',
     level: (c) => band(c.pressure_change_24h, A.pressureDropHigh, A.pressureDropModerate, true),
@@ -49,7 +46,6 @@ const RULES = [
   {
     id: 'humidity',
     feature: 'humidity',
-    reported: 'Humid weather',
     enemy: 'weather',
     title: 'Heads up: humid weather today',
     level: (c) => band(c.humidity, A.humidityHigh, A.humidityModerate),
@@ -58,7 +54,6 @@ const RULES = [
   {
     id: 'cold_air',
     feature: 'cold_air',
-    reported: 'Cold air',
     enemy: 'weather',
     title: 'Heads up: cold air today',
     level: (c) => band(c.temperature_c, A.coldHighC, A.coldModerateC, true),
@@ -81,7 +76,6 @@ export function loggedSymptoms(entry) {
 export function buildTriggerAlerts({ environment, triggers, profile, game, entry, date }) {
   if (!environment?.current) return [];
   const learned = profile.isDemo || game.checkIns >= BASELINE_WINDOW_DAYS;
-  const reportedList = profile.survey?.triggers || [];
   const symptoms = loggedSymptoms(entry);
   const alerts = [];
 
@@ -91,21 +85,17 @@ export function buildTriggerAlerts({ environment, triggers, profile, game, entry
 
     const trigger = (triggers || []).find((item) => item.feature === rule.feature && item.discovered);
     const strength = learned && trigger && STRENGTH_ORDER[trigger.strength] ? trigger.strength : null;
-    const reported = Boolean(rule.reported && reportedList.includes(rule.reported));
 
-    // Strong triggers alert on moderate or high conditions; moderate triggers and reported
-    // triggers alert on high conditions only; weak triggers never alert.
-    const qualifies = strength === 'strong' || ((strength === 'moderate' || reported) && today === 'high');
+    // Strong triggers alert on moderate or high conditions; moderate triggers on high only;
+    // weak triggers never alert.
+    const qualifies = strength === 'strong' || (strength === 'moderate' && today === 'high');
     if (!qualifies) continue;
 
     const situation = rule.describe(environment.current, today);
     const lead = symptoms
       ? `You logged symptoms today while ${situation} near you.`
       : `${capitalize(situation)} near you today.`;
-    const reason =
-      strength && strength !== 'weak'
-        ? `${trigger.label} had a ${strength} influence on this demo model's predictions for you.`
-        : `You reported ${rule.reported.toLowerCase()} as a trigger.`;
+    const reason = `${trigger.label} had a ${strength} influence on this demo model's predictions for you.`;
     const body = `${lead} ${reason} You may be more likely to have a flare-up. Consider keeping your rescue inhaler with you and reviewing your asthma action plan.`;
 
     alerts.push({

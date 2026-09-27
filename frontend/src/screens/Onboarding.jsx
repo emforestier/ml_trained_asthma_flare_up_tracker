@@ -7,14 +7,13 @@ import Companion from '../components/Companion';
 import Wordmark from '../components/Wordmark';
 import { DEFAULT_COMPANION_NAME, DISCLAIMER } from '../config';
 import { useGame } from '../state/GameContext';
-import { DEMO_USER_ID, NO_RESCUE_DAYS, QUESTIONS, SURVEY_INTRO, ZERO_PUFFS, baselineEstimate, toggleTrigger } from '../survey';
+import { DEMO_USER_ID, NO_RESCUE_DAYS, QUESTIONS, SURVEY_INTRO, ZERO_PUFFS, baselineEstimate } from '../survey';
 
-const EMPTY_ANSWERS = { nickname: '', city: QUESTIONS[1].options[0], triggers: [] };
+const EMPTY_ANSWERS = { nickname: '', city: QUESTIONS[1].options[0] };
 
 function isAnswered(question, answers) {
   const value = answers[question.id];
   if (question.type === 'text') return Boolean(value && value.trim());
-  if (question.type === 'multi') return value.length > 0;
   return Boolean(value);
 }
 
@@ -23,7 +22,7 @@ export default function Onboarding({ mode = 'create' }) {
   const navigate = useNavigate();
   const { profile: savedProfile, startDemo, finishOnboarding, updateProfile } = useGame();
   const [answers, setAnswers] = useState(() =>
-    editing ? { ...EMPTY_ANSWERS, ...savedProfile.survey, triggers: savedProfile.survey?.triggers || [] } : EMPTY_ANSWERS,
+    editing ? { ...EMPTY_ANSWERS, ...savedProfile.survey } : EMPTY_ANSWERS,
   );
   const [step, setStep] = useState(editing ? 0 : 'intro'); // 'intro', a question index, or 'done'
   const [saving, setSaving] = useState(false);
@@ -176,16 +175,16 @@ export default function Onboarding({ mode = 'create' }) {
       )}
 
       {question.type !== 'text' && (
-        <div className="option-list" role={question.type === 'multi' ? 'group' : 'radiogroup'} aria-labelledby="question">
+        <div className="option-list" role="radiogroup" aria-labelledby="question">
           {question.options.map((option) => {
-            const selected = question.type === 'multi' ? answers.triggers.includes(option) : answers[question.id] === option;
+            const selected = answers[question.id] === option;
             return (
               <button
                 key={option}
                 className={`option${selected ? ' selected' : ''}`}
-                role={question.type === 'multi' ? 'checkbox' : 'radio'}
+                role="radio"
                 aria-checked={selected}
-                onClick={() => set(question.id, question.type === 'multi' ? toggleTrigger(answers.triggers, option) : option)}
+                onClick={() => set(question.id, option)}
               >
                 <span className="option-mark" aria-hidden="true">
                   {selected ? '✓' : ''}

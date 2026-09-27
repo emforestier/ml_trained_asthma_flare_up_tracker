@@ -4,3 +4,8 @@ pymongo
 python-dotenv
 tzdata
 pytest
+lightgbm
+scikit-learn
+pandas
+joblib
+google-genai

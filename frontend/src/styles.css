@@ -1128,3 +1128,50 @@ code {
 .settings-row span { display: grid; font-weight: 700; color: var(--ink); font-size: 0.95rem; }
 .settings-row small { font-weight: 400; color: var(--ink-soft); font-size: 0.8rem; }
 .text-button.danger { color: #b3261e; }
+
+/* ---------- App wordmark ---------- */
+.wordmark { display: grid; justify-items: center; gap: 2px; text-align: center; }
+.wordmark-name { display: inline-flex; align-items: center; gap: 8px; font-weight: 900; letter-spacing: 0.01em; line-height: 1; }
+.wordmark-swoosh { fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; opacity: 0.85; }
+.wordmark.large { margin-top: 18px; }
+.wordmark.large .wordmark-name { font-size: 2.6rem; }
+.wordmark.large .wordmark-swoosh { width: 40px; height: 30px; }
+.wordmark.small .wordmark-name { font-size: 1.25rem; }
+.wordmark.small .wordmark-swoosh { width: 24px; height: 18px; }
+.wordmark.light { color: #fff; text-shadow: 0 2px 8px rgba(0, 0, 0, 0.18); }
+.wordmark.dark { color: var(--teal-deep); }
+.wordmark-tagline { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; opacity: 0.9; }
+.onboarding .wordmark + .onboarding-companion { margin-top: 4px; }
+
+/* ---------- Icons (one line-icon set, colored by meaning) ---------- */
+.icon { display: inline-block; flex: none; vertical-align: -0.18em; }
+.round-button .icon, .menu-item .icon { color: var(--teal-deep); }
+.emergency-button .icon { color: #b3261e; }
+.close-button .icon { color: #fff; }
+.menu-screen-close .icon { color: var(--teal); }
+.icon-streak { color: #e8742a; }
+.streak-chip, .level-streak, .streak-title { display: inline-flex; align-items: center; gap: 4px; }
+.condition-chip { display: inline-flex; align-items: center; gap: 5px; }
+.conditions .condition-rows .icon, .accuracy .icon, .learning-banner .icon { color: var(--teal); }
+.learning-banner { display: flex; align-items: center; gap: 6px; }
+.factor-icon { color: var(--teal-deep); }
+.activity-icon { color: var(--teal); }
+.profile-action-icon .icon { color: #fff; }
+.reward-banner { display: inline-flex; align-items: center; gap: 6px; }
+.reward-banner .icon { color: var(--teal); }
+.stamp .icon { color: inherit; }
+.stamp.bonus:not(.done) { color: var(--sun); }
+.medal-disc .icon { color: #fff; }
+.medal.tier-0 .medal-disc .icon { color: #8a9793; }
+.alert-close .icon { color: var(--ink-soft); }
+
+/* ---------- Menu emblem on the main button ---------- */
+.main-button {
+  background: none;
+  padding: 0;
+  border: 3px solid #fff;
+  overflow: hidden;
+}
+.menu-emblem { display: block; transition: transform 0.25s ease; }
+.main-button:hover .menu-emblem { transform: rotate(-12deg); }
+.main-button:active .menu-emblem { transform: rotate(-24deg) scale(0.96); }

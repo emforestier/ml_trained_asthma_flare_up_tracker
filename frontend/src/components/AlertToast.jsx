@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { notificationPermission, requestNotifications, sendSystemNotification } from '../notify';
 import Enemy from './Enemy';
+import Icon from './Icon';
 
 export default function AlertToast({ alert, remaining = 0, inline = false, onDismiss, onOpen }) {
   const [permission, setPermission] = useState(notificationPermission);
@@ -37,7 +38,7 @@ export default function AlertToast({ alert, remaining = 0, inline = false, onDis
       </div>
       {onDismiss && (
         <button className="alert-close" onClick={onDismiss} aria-label="Dismiss alert">
-          ×
+          <Icon name="close" size={16} />
         </button>
       )}
     </aside>

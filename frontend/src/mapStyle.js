@@ -128,5 +128,82 @@ export const gameMapStyle = {
       },
       paint: { 'text-color': COLORS.label, 'text-halo-color': COLORS.labelHalo, 'text-halo-width': 1.6 },
     },
+    // Place names reveal themselves as you zoom in: neighborhoods first, then parks and lakes,
+    // then landmarks and named buildings (most important first). MapLibre hides any label that
+    // would overlap another.
+    {
+      id: 'neighborhood-names',
+      type: 'symbol',
+      source: 'openmaptiles',
+      'source-layer': 'place',
+      minzoom: 13,
+      maxzoom: 16.5,
+      filter: ['in', ['get', 'class'], ['literal', ['suburb', 'quarter', 'neighbourhood']]],
+      layout: {
+        'text-field': ['upcase', ['coalesce', ['get', 'name:en'], ['get', 'name']]],
+        'text-font': ['Noto Sans Bold'],
+        'text-size': ['interpolate', ['linear'], ['zoom'], 13, 11, 16, 14],
+        'text-letter-spacing': 0.18,
+        'text-max-width': 8,
+      },
+      paint: { 'text-color': 'rgba(47, 85, 87, 0.75)', 'text-halo-color': 'rgba(255, 255, 255, 0.6)', 'text-halo-width': 1.4 },
+    },
+    {
+      id: 'water-names',
+      type: 'symbol',
+      source: 'openmaptiles',
+      'source-layer': 'water_name',
+      minzoom: 14,
+      layout: {
+        'text-field': ['coalesce', ['get', 'name:en'], ['get', 'name']],
+        'text-font': ['Noto Sans Italic'],
+        'text-size': 12,
+        'text-max-width': 8,
+      },
+      paint: { 'text-color': '#1f5f8f', 'text-halo-color': 'rgba(255, 255, 255, 0.8)', 'text-halo-width': 1.4 },
+    },
+    {
+      id: 'park-names',
+      type: 'symbol',
+      source: 'openmaptiles',
+      'source-layer': 'park',
+      minzoom: 15,
+      filter: ['has', 'name'],
+      layout: {
+        'text-field': ['coalesce', ['get', 'name:en'], ['get', 'name']],
+        'text-font': ['Noto Sans Bold'],
+        'text-size': 12,
+        'text-max-width': 8,
+      },
+      paint: { 'text-color': '#1f6e3f', 'text-halo-color': 'rgba(255, 255, 255, 0.85)', 'text-halo-width': 1.5 },
+    },
+    // Landmarks and named buildings: the most important from zoom 16, more at 17, the rest at 18.
+    ...[
+      ['place-names-major', 16, 0, 8],
+      ['place-names-more', 17, 9, 20],
+      ['place-names-all', 18, 21, 1000],
+    ].map(([id, minzoom, minRank, maxRank]) => ({
+      id,
+      type: 'symbol',
+      source: 'openmaptiles',
+      'source-layer': 'poi',
+      minzoom,
+      filter: [
+        'all',
+        ['has', 'name'],
+        ['>=', ['get', 'rank'], minRank],
+        ['<=', ['get', 'rank'], maxRank],
+        // Bus and train stops are named after street corners, which just clutters the map.
+        ['!', ['in', ['get', 'class'], ['literal', ['bus', 'railway', 'ferry_terminal', 'aerialway']]]],
+      ],
+      layout: {
+        'text-field': ['coalesce', ['get', 'name:en'], ['get', 'name']],
+        'text-font': ['Noto Sans Regular'],
+        'text-size': ['interpolate', ['linear'], ['zoom'], 16, 11, 19, 13],
+        'text-max-width': 9,
+        'text-padding': 4,
+      },
+      paint: { 'text-color': '#2f5557', 'text-halo-color': 'rgba(255, 255, 255, 0.9)', 'text-halo-width': 1.6 },
+    })),
   ],
 };

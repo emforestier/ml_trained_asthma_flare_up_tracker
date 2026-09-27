@@ -20,10 +20,10 @@ const STORAGE_KEY = 'breezy-state-v2';
 // symptoms or using less medication).
 export const MEDAL_TIERS = ['Bronze', 'Silver', 'Gold'];
 export const MEDALS = [
-  { id: 'streak', icon: '🔥', name: 'Streak keeper', unit: 'day streak', stat: (g) => g.bestStreak, tiers: [3, 7, 30] },
-  { id: 'checkins', icon: '📅', name: 'Check-in pro', unit: 'check-ins', stat: (g) => g.checkIns, tiers: [7, 14, 30] },
-  { id: 'feedback', icon: '🎯', name: 'Truth teller', unit: 'answers', stat: (g) => g.feedbackCount, tiers: [3, 10, 25] },
-  { id: 'level', icon: '⭐', name: 'Rising star', unit: 'level', stat: (g) => levelInfo(g.xp).level, tiers: [3, 5, 10] },
+  { id: 'streak', icon: 'streak', name: 'Streak keeper', unit: 'day streak', stat: (g) => g.bestStreak, tiers: [3, 7, 30] },
+  { id: 'checkins', icon: 'calendar', name: 'Check-in pro', unit: 'check-ins', stat: (g) => g.checkIns, tiers: [7, 14, 30] },
+  { id: 'feedback', icon: 'target', name: 'Truth teller', unit: 'answers', stat: (g) => g.feedbackCount, tiers: [3, 10, 25] },
+  { id: 'level', icon: 'star', name: 'Rising star', unit: 'level', stat: (g) => levelInfo(g.xp).level, tiers: [3, 5, 10] },
 ];
 
 // How many tiers of a medal are earned: 0 (none) to 3 (gold).

@@ -6,12 +6,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { buildTriggerAlerts } from '../alerts';
 import { getEnvironment, getLog, getRisk, getTriggers, useApi } from '../api';
 import AlertToast from '../components/AlertToast';
-import Companion from '../components/Companion';
 import ConditionChip from '../components/ConditionChip';
 import EnemyDialog from '../components/EnemyDialog';
 import FeedbackDialog from '../components/FeedbackDialog';
 import GameMap from '../components/GameMap';
 import MainMenu from '../components/MainMenu';
+import MenuEmblem from '../components/MenuEmblem';
 import MapEntities, { MIN_ENEMY_ZOOM } from '../components/MapEntities';
 import NearbyPanel from '../components/NearbyPanel';
 import TrainerBadge from '../components/TrainerBadge';
@@ -159,7 +159,7 @@ export default function MapHome() {
       <div className="hud-bottom">
         <TrainerBadge />
         <button className="main-button" onClick={() => setMenuOpen(true)} aria-label="Open menu">
-          <Companion mood="happy" size={50} label="Menu" />
+          <MenuEmblem />
         </button>
         <NearbyPanel zones={zones} onSelect={(zone) => flyTo(zone.lat, zone.lon, 17)} />
       </div>

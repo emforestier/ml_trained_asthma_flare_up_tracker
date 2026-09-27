@@ -1148,7 +1148,7 @@ code {
 .round-button .icon, .menu-item .icon { color: var(--teal-deep); }
 .emergency-button .icon { color: #b3261e; }
 .close-button .icon { color: #fff; }
-.menu-screen-close .icon, .profile-close .icon { color: var(--teal); }
+.menu-screen-close .icon { color: var(--teal); }
 .icon-streak { color: #e8742a; }
 .streak-chip, .level-streak, .streak-title { display: inline-flex; align-items: center; gap: 4px; }
 .condition-chip { display: inline-flex; align-items: center; gap: 5px; }
@@ -1164,3 +1164,14 @@ code {
 .medal-disc .icon { color: #fff; }
 .medal.tier-0 .medal-disc .icon { color: #8a9793; }
 .alert-close .icon { color: var(--ink-soft); }
+
+/* ---------- Menu emblem on the main button ---------- */
+.main-button {
+  background: none;
+  padding: 0;
+  border: 3px solid #fff;
+  overflow: hidden;
+}
+.menu-emblem { display: block; transition: transform 0.25s ease; }
+.main-button:hover .menu-emblem { transform: rotate(-12deg); }
+.main-button:active .menu-emblem { transform: rotate(-24deg) scale(0.96); }

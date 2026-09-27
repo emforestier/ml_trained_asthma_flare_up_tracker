@@ -1,0 +1,98 @@
+/* ---------- Phone frame ----------
+   On laptops and desktops the app sits inside a phone outline on a Breezy backdrop, so demos and
+   screen recordings look like a real mobile app. On phones none of this shows.
+
+   --safe-top is the space kept clear at the top of the screen: the phone's own notch area on
+   real devices, or the frame's camera notch on larger screens. */
+/* The stage fills the window at every size, so the app always has room (the frame only adds a border). */
+.stage { height: 100%; }
+.phone { --safe-top: env(safe-area-inset-top, 0px); }
+.phone-island, .stage-brand { display: none; }
+
+.phone .hud-top { top: calc(12px + var(--safe-top)); }
+.phone .alert-slot { top: calc(118px + var(--safe-top)); }
+.phone .scene-back { top: calc(14px + var(--safe-top)); }
+.phone .profile-tabs { padding-top: calc(10px + var(--safe-top)); }
+.phone .menu-screen { padding-top: calc(24px + var(--safe-top)); }
+.phone .onboarding { padding-top: calc(28px + var(--safe-top)); }
+.phone .emergency { padding-top: calc(32px + var(--safe-top)); }
+
+/* Keep the map's top labels on one line on narrow screens (390px phones and the frame). */
+.risk-pill { gap: 8px; padding: 8px 14px; }
+.glass-pill small, .mock-flag { white-space: nowrap; }
+
+/* Selectors start with .stage (and html body) so they win over styles.css, which loads later. */
+@media (min-width: 700px) and (min-height: 600px) {
+  html body {
+    background:
+      radial-gradient(circle at 18% 22%, rgba(143, 220, 192, 0.35), transparent 40%),
+      radial-gradient(circle at 82% 78%, rgba(92, 193, 160, 0.3), transparent 45%),
+      linear-gradient(140deg, #173f45 0%, #2f6f73 50%, #3f9a8c 100%);
+  }
+  .stage {
+    height: auto;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 72px;
+    padding: 24px;
+  }
+  .stage > .phone {
+    --safe-top: 34px;
+    flex: none;
+    width: 390px;
+    max-width: 390px;
+    height: min(844px, calc(100vh - 48px));
+    margin: 0;
+    border-radius: 50px;
+    border: 12px solid #10181a;
+    box-shadow:
+      0 0 0 2px #33464a,
+      0 30px 80px rgba(0, 0, 0, 0.45),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+    /* Makes position: fixed children (like the round close buttons) stay inside the phone. */
+    transform: translateZ(0);
+  }
+  /* Camera notch and home indicator. */
+  .phone-island {
+    display: block;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 112px;
+    height: 30px;
+    border-radius: 20px;
+    background: #10181a;
+    z-index: 5000;
+    pointer-events: none;
+  }
+  .stage > .phone::after {
+    content: '';
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 5px;
+    border-radius: 999px;
+    background: rgba(16, 24, 26, 0.55);
+    z-index: 5000;
+    pointer-events: none;
+  }
+}
+
+/* Wide screens also show the app's name beside the phone. */
+@media (min-width: 1000px) and (min-height: 600px) {
+  .stage-brand {
+    display: grid;
+    gap: 14px;
+    max-width: 320px;
+    color: #fff;
+  }
+  .stage-brand .wordmark { justify-items: start; text-align: left; margin: 0; }
+  .stage-brand .wordmark.large .wordmark-name { font-size: 3.4rem; }
+  .stage-brand p { font-size: 1rem; line-height: 1.5; opacity: 0.88; }
+  .stage-brand .stage-note { font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7; }
+}

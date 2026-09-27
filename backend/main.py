@@ -1,3 +1,8 @@
+from datetime import timedelta
+from zoneinfo import ZoneInfo
+from datetime import datetime, timezone
+from pymongo.errors import PyMongoError
+from backend.db import get_db, DatabaseUnavailable
 import requests
 from backend.environment import fetch_environment
 import json
@@ -59,7 +64,55 @@ def get_summary(user: str = "demo-user-1"):
 
 @app.get("/log")
 def get_log(user: str = "demo-user-1"):
-    return load_sample("log")
+    try:
+        db = get_db()
+
+        entries = list(
+            db.daily_logs.find(
+                {"user": user},
+                {"_id": 0},
+            ).sort("date", -1)
+        )
+
+    except (DatabaseUnavailable, PyMongoError):
+        raise HTTPException(
+            status_code=503,
+            detail="Could not load saved check-ins. Please try again.",
+        )
+
+    # Count distinct dates, not the number of Save button clicks.
+    logged_dates = {entry["date"] for entry in entries}
+
+    today = datetime.now(
+        ZoneInfo("America/New_York")
+    ).date()
+
+    # Keep yesterday's streak active until today has passed.
+    cursor = today
+    if cursor.isoformat() not in logged_dates:
+        cursor -= timedelta(days=1)
+
+    streak = 0
+    while cursor.isoformat() in logged_dates:
+        streak += 1
+        cursor -= timedelta(days=1)
+
+    return {
+        "user": user,
+        "data_mode": "saved_logs",
+        "storage": "mongodb",
+        "days_logged": len(logged_dates),
+        "streak": streak,
+        "entries": entries,
+        "xp": 0,
+        "xp_status": "managed_by_frontend",
+        "accuracy": {
+            "correct": 0,
+            "total": 0,
+        },
+        "accuracy_status": "not_calculated",
+        "last_prediction": None,
+    }
 
 
 
@@ -92,30 +145,120 @@ class DailyLog(BaseModel):
 
 @app.post("/log")
 def receive_log(log: DailyLog):
-    eligible_puffs = log.puffs - log.pre_exercise_puffs
+    # Convert the validated check-in into a database record.
+    # mode="json" converts its date to a YYYY-MM-DD string.
+    record = log.model_dump(mode="json")
+            # Only attach current conditions to a check-in for today.
+    today = datetime.now(
+        ZoneInfo("America/New_York")
+    ).date()
 
-    symptom_total = (
+    if log.date == today:
+        try:
+            environment = get_environment(user=log.user)
+
+            if environment.get("valid_for") == log.date.isoformat():
+                record["environment"] = environment
+                record["environment_status"] = (
+                    "snapshot_at_check_in"
+                )
+            else:
+                record["environment"] = None
+                record["environment_status"] = (
+                    "unavailable_for_requested_date"
+                )
+
+        except HTTPException:
+            # A weather-service failure should not prevent
+            # the person from saving their symptoms.
+            record["environment"] = None
+            record["environment_status"] = (
+                "temporarily_unavailable"
+            )
+    else:
+        record["environment"] = None
+        record["environment_status"] = (
+            "historical_conditions_not_connected"
+        )
+
+    record["eligible_rescue_puffs"] = (
+        log.puffs - log.pre_exercise_puffs
+    )
+
+    record["symptom_total"] = (
         log.symptoms.breath
         + log.symptoms.wheeze
         + log.symptoms.cough
     )
 
-    # Step 3 checks the request format.
-    # Storage will be connected in a later step.
-    raise HTTPException(
-        status_code=501,
-        detail={
-            "status": "validated_not_saved",
-            "saved": False,
-            "message": (
-                "Check-in format is valid, but storage "
-                "is not connected yet."
+    now = datetime.now(timezone.utc).isoformat()
+    record["updated_at"] = now
+
+    # This combination identifies one person's one-day check-in.
+    lookup = {
+        "user": record["user"],
+        "date": record["date"],
+    }
+
+    try:
+        db = get_db()
+                # Keep the previous snapshot if this request
+        # could not obtain environmental information.
+        if record.get("environment") is None:
+            existing = db.daily_logs.find_one(
+                lookup,
+                {
+                    "_id": 0,
+                    "environment": 1,
+                    "environment_status": 1,
+                },
+            )
+
+            if existing and existing.get("environment") is not None:
+                record["environment"] = existing["environment"]
+                record["environment_status"] = existing.get(
+                    "environment_status",
+                    "snapshot_at_check_in",
+                )
+
+
+
+        result = db.daily_logs.update_one(
+            lookup,
+            {
+                "$set": record,
+                "$setOnInsert": {"created_at": now},
+            },
+            upsert=True,
+        )
+
+        if not result.acknowledged:
+            raise HTTPException(
+                status_code=503,
+                detail="The database did not confirm the save.",
+            )
+
+    except (DatabaseUnavailable, PyMongoError):
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "Could not confirm that the check-in was saved. "
+                "Please retry using the same user and date."
             ),
-            "received": log.model_dump(mode="json"),
-            "eligible_rescue_puffs": eligible_puffs,
-            "symptom_total": symptom_total
-        }
-    )
+        )
+
+    return {
+        "status": "saved",
+        "saved": True,
+        "storage": "mongodb",
+        "operation": (
+            "created"
+            if result.upserted_id is not None
+            else "updated"
+        ),
+        "message": "Your check-in was saved.",
+        "log": record,
+    }
 
 class SurveyAnswers(BaseModel):
     nickname: str = Field(min_length=1, max_length=20)
@@ -180,3 +323,4 @@ def receive_feedback(feedback: FeedbackRequest):
             "received": feedback.model_dump(mode="json")
         }
     )
+
